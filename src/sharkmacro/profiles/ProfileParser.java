@@ -82,9 +82,6 @@ public final class ProfileParser {
 	}
 
 	public static String getFilename() {
-		// String filename =
-		// SmartDashboard.getString(Constants.SMARTDASHBOARD_PROFILE_NAME_KEY,
-		// Constants.PROFILE_DEFAULT_PREFIX);
 		String filename = Constants.PROFILE_DEFAULT_PREFIX;
 		return Constants.PROFILE_STORAGE_DIRECTORY + "/" + filename
 				+ String.format("%04d", findLatestNumberedFile(filename) + 1) + Constants.PROFILE_FILE_TYPE;

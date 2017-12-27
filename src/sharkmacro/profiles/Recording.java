@@ -13,6 +13,7 @@ public class Recording {
 	}
 
 	public Profile toProfile() {
+
 		// get rid of any differential in list size
 		int minSize = Integer.MAX_VALUE;
 		for (int i = 0; i < recordings.size(); i++) {
@@ -29,7 +30,6 @@ public class Recording {
 		ArrayList<Double> rightPosition = recordings.get(2);
 		ArrayList<Double> rightVelocity = recordings.get(3);
 
-		// convert to from nat units per 100ms to rpm and create 2d double array
 		double[][] leftProfile = new double[minSize][3];
 		double[][] rightProfile = new double[minSize][3];
 

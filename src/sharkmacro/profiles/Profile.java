@@ -30,10 +30,6 @@ public class Profile {
 	}
 
 	public Profile(String[][] leftProfile, String[][] rightProfile) {
-		System.out.println("Left: " + Arrays.deepToString(leftProfile));
-		System.out.println();
-		System.out.println("Right: " + Arrays.deepToString(rightProfile));
-
 		this.leftProfile = toDoubleArray(leftProfile);
 		this.rightProfile = toDoubleArray(rightProfile);
 		this.length = this.leftProfile.length;
