@@ -56,7 +56,7 @@ public final class ProfileParser {
 		List<String[]> profileRaw = new ArrayList<String[]>(0);
 		try {
 			reader = new CSVReader(
-					new FileReader(Constants.PROFILE_STORAGE_DIRECTORY + "/" + fileName + Constants.PROFILE_FILE_TYPE));
+					new FileReader(formatFilename(fileName)));
 			profileRaw = reader.readAll();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -176,6 +176,13 @@ public final class ProfileParser {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
+	}
+	
+	private static String formatFilename(String name) {
+		if (!name.endsWith(Constants.PROFILE_FILE_TYPE)) {
+			name += Constants.PROFILE_FILE_TYPE;
+		}
+		return Constants.PROFILE_STORAGE_DIRECTORY + "/" + name;
 	}
 
 }
