@@ -1,4 +1,4 @@
-package sharkmacro.profiles;
+package sharkmacro.motionprofiles;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;

@@ -1,4 +1,4 @@
-package sharkmacro.profiles;
+package sharkmacro.motionprofiles;
 
 import java.io.File;
 import java.io.FileNotFoundException;
