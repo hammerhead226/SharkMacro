@@ -14,7 +14,7 @@ public class Recording {
 
 	public Profile toProfile() {
 
-		// get rid of any differential in list size
+		// Remove differential in list size
 		int minSize = Integer.MAX_VALUE;
 		for (int i = 0; i < recordings.size(); i++) {
 			if (recordings.get(i).size() < minSize) {
@@ -24,7 +24,18 @@ public class Recording {
 		for (int i = 0; i < recordings.size(); i++) {
 			recordings.get(i).subList(minSize, recordings.get(i).size()).clear();
 		}
-
+		
+		// Remove leading zero rows
+		for (int i = 0; i < minSize; i++) {
+			if (!areEqual(i, 0)) {
+				for (int j = 0; j < recordings.size(); j++) {
+					recordings.get(j).subList(0, i).clear();
+				}
+				minSize -= i;
+				break;
+			}
+		}
+		
 		ArrayList<Double> leftPosition = recordings.get(0);
 		ArrayList<Double> leftVelocity = recordings.get(1);
 		ArrayList<Double> rightPosition = recordings.get(2);
@@ -43,5 +54,10 @@ public class Recording {
 			rightProfile[i][2] = Constants.DT_MS;
 		}
 		return new Profile(leftProfile, rightProfile);
+	}
+
+	private boolean areEqual(int idx, double comp) {
+		return (recordings.get(0).get(idx) == comp && recordings.get(1).get(idx) == comp
+				&& recordings.get(2).get(idx) == comp && recordings.get(3).get(idx) == comp);
 	}
 }
