@@ -47,7 +47,7 @@ public class ProfileRecorder {
 			}
 		};
 
-		return new Recording(lists);
+		return new Recording(lists, talons[0], talons[1]);
 	}
 
 	private void clear() {

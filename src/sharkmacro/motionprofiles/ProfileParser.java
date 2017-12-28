@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ctre.CANTalon;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
@@ -51,7 +52,7 @@ public final class ProfileParser {
 		writer.close();
 	}
 
-	public static Profile readFromFile(String fileName) throws FileNotFoundException, IOException {
+	public static Profile readFromFile(String fileName, CANTalon leftTalon, CANTalon rightTalon) throws FileNotFoundException, IOException {
 		CSVReader reader;
 		List<String[]> profileRaw = new ArrayList<String[]>(0);
 		try {
@@ -78,7 +79,7 @@ public final class ProfileParser {
 			right[i][2] = profileRaw.get(i)[4];
 		}
 
-		return new Profile(left, right);
+		return new Profile(left, right, leftTalon, rightTalon);
 	}
 
 	public static String getFilename() {
