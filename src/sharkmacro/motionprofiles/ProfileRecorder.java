@@ -10,6 +10,7 @@ import sharkmacro.Constants;
 public class ProfileRecorder {
 
 	private final double dt_s = Constants.DT_SECONDS;
+	private boolean isRecording = false;
 
 	private final CANTalon[] talons;
 
@@ -32,6 +33,7 @@ public class ProfileRecorder {
 		// Create new thread running at dt to record encoder readings
 		clear();
 		thread.startPeriodic(dt_s);
+		isRecording = true;
 	}
 
 	public Recording stop() {
@@ -46,7 +48,7 @@ public class ProfileRecorder {
 				add(rightVelocity);
 			}
 		};
-
+		isRecording = false;
 		return new Recording(lists, talons[0], talons[1]);
 	}
 
@@ -56,6 +58,10 @@ public class ProfileRecorder {
 				lists.get(i).clear();
 			}
 		}
+	}
+	
+	public boolean isRecording() {
+		return isRecording;
 	}
 
 	class PeriodicRunnable implements java.lang.Runnable {
