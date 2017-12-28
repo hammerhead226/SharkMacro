@@ -2,7 +2,6 @@ package sharkmacro.motionprofiles;
 
 import java.util.Arrays;
 
-import sharkmacro.SharkMacro;
 
 /**
  * Class representation of a motion profile. Formatted to work with Talon SRX

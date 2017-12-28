@@ -6,8 +6,6 @@ import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.Notifier;
 import sharkmacro.Constants;
-import sharkmacro.SharkMacro;
-import sharkmacro.SharkMacroNotInitialized;
 
 public class ProfileRecorder {
 
