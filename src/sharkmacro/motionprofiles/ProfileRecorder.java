@@ -6,12 +6,11 @@ import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.Notifier;
 import sharkmacro.Constants;
-import sharkmacro.SharkMacro;
-import sharkmacro.SharkMacroNotInitialized;
 
 public class ProfileRecorder {
 
 	private final double dt_s = Constants.DT_SECONDS;
+	private boolean isRecording = false;
 
 	private final CANTalon[] talons;
 
@@ -25,16 +24,8 @@ public class ProfileRecorder {
 	/**
 	 * Construct a new ProfileRecorder.
 	 */
-	public ProfileRecorder() throws SharkMacroNotInitialized {
-		if (!SharkMacro.isInitialized()) {
-			try {
-				throw new SharkMacroNotInitialized();
-			} catch (SharkMacroNotInitialized e) {
-				e.printStackTrace();
-				// System.exit(1);
-			}
-		}
-		talons = new CANTalon[] { SharkMacro.leftTalon, SharkMacro.rightTalon };
+	public ProfileRecorder(CANTalon left, CANTalon right) {
+		talons = new CANTalon[] { left, right };
 		thread = new Notifier(new PeriodicRunnable());
 	}
 
@@ -42,6 +33,7 @@ public class ProfileRecorder {
 		// Create new thread running at dt to record encoder readings
 		clear();
 		thread.startPeriodic(dt_s);
+		isRecording = true;
 	}
 
 	public Recording stop() {
@@ -56,8 +48,8 @@ public class ProfileRecorder {
 				add(rightVelocity);
 			}
 		};
-
-		return new Recording(lists);
+		isRecording = false;
+		return new Recording(lists, talons[0], talons[1]);
 	}
 
 	private void clear() {
@@ -66,6 +58,10 @@ public class ProfileRecorder {
 				lists.get(i).clear();
 			}
 		}
+	}
+	
+	public boolean isRecording() {
+		return isRecording;
 	}
 
 	class PeriodicRunnable implements java.lang.Runnable {

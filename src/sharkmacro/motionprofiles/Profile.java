@@ -2,7 +2,7 @@ package sharkmacro.motionprofiles;
 
 import java.util.Arrays;
 
-import sharkmacro.SharkMacro;
+import com.ctre.CANTalon;
 
 /**
  * Class representation of a motion profile. Formatted to work with Talon SRX
@@ -18,35 +18,45 @@ public class Profile {
 
 	private ProfileHandler left;
 	private ProfileHandler right;
+	
+	private CANTalon leftTalon;
+	private CANTalon rightTalon;
 
 	private final double[][] leftProfile;
 	private final double[][] rightProfile;
 
-	public Profile(double[][] leftProfile, double[][] rightProfile) {
+	public Profile(double[][] leftProfile, double[][] rightProfile, CANTalon leftTalon, CANTalon rightTalon) {
 		this.leftProfile = leftProfile;
 		this.rightProfile = rightProfile;
+		this.leftTalon = leftTalon;
+		this.rightTalon = rightTalon;
 		this.length = this.leftProfile.length;
 		this.dt = (int) this.leftProfile[0][2];
 	}
 
-	public Profile(String[][] leftProfile, String[][] rightProfile) {
+	public Profile(String[][] leftProfile, String[][] rightProfile, CANTalon leftTalon, CANTalon rightTalon) {
 		this.leftProfile = toDoubleArray(leftProfile);
 		this.rightProfile = toDoubleArray(rightProfile);
+		this.leftTalon = leftTalon;
+		this.rightTalon = rightTalon;
 		this.length = this.leftProfile.length;
 		this.dt = (int) this.leftProfile[0][2];
 	}
 
-	public void execute() {
-		left = new ProfileHandler(leftProfile, SharkMacro.leftTalon, SharkMacro.leftGainsProfile);
-		right = new ProfileHandler(rightProfile, SharkMacro.rightTalon, SharkMacro.rightGainsProfile);
+	public void execute(int leftGainsProfile, int rightGainsProfile) {
+		left = new ProfileHandler(leftProfile, leftTalon, leftGainsProfile);
+		right = new ProfileHandler(rightProfile, rightTalon, rightGainsProfile);
 		left.execute();
 		right.execute();
-
 	}
 
 	public void onInterrupt() {
 		left.onInterrupt();
 		right.onInterrupt();
+	}
+	
+	public boolean isFinished() {
+		return left.isFinished() && right.isFinished();
 	}
 
 	public double[][] getLeftProfile_Double() {
