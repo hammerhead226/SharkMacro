@@ -25,16 +25,8 @@ public class ProfileRecorder {
 	/**
 	 * Construct a new ProfileRecorder.
 	 */
-	public ProfileRecorder() throws SharkMacroNotInitialized {
-		if (!SharkMacro.isInitialized()) {
-			try {
-				throw new SharkMacroNotInitialized();
-			} catch (SharkMacroNotInitialized e) {
-				e.printStackTrace();
-				// System.exit(1);
-			}
-		}
-		talons = new CANTalon[] { SharkMacro.leftTalon, SharkMacro.rightTalon };
+	public ProfileRecorder(CANTalon left, CANTalon right) {
+		talons = new CANTalon[] { left, right };
 		thread = new Notifier(new PeriodicRunnable());
 	}
 
