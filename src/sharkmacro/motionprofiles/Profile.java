@@ -48,12 +48,15 @@ public class Profile {
 		right = new ProfileHandler(rightProfile, rightTalon, rightGainsProfile);
 		left.execute();
 		right.execute();
-
 	}
 
 	public void onInterrupt() {
 		left.onInterrupt();
 		right.onInterrupt();
+	}
+	
+	public boolean isFinished() {
+		return left.isFinished() && right.isFinished();
 	}
 
 	public double[][] getLeftProfile_Double() {
