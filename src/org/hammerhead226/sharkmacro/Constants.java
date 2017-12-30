@@ -18,6 +18,4 @@ public final class Constants {
 
 	public static final int MINIMUM_POINTS_IN_TALON = 5;
 
-	public static final long CONTROLLEASE_TIMEOUT_DUR_MS = 100;
-
 }
