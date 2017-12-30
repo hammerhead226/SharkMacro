@@ -4,7 +4,7 @@ public final class Constants {
 
 	public static final double DT_MS = 10.0;
 	public static final double DT_SECONDS = DT_MS / 1000.0;
-	public static final int ARRAYLIST_DEFAULT_LENGTH = 2500;
+	public static final int PROFILERECORDER_LIST_DEFAULT_LENGTH = 2500;
 
 	public static final String PROFILE_DEFAULT_PREFIX = "profile";
 	public static final String PROFILE_FILE_TYPE = ".csv";
