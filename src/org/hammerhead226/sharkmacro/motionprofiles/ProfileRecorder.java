@@ -15,10 +15,10 @@ public class ProfileRecorder {
 
 	private final CANTalon[] talons;
 
-	private ArrayList<Double> leftPosition = new ArrayList<Double>(Constants.ARRAYLIST_DEFAULT_LENGTH);
-	private ArrayList<Double> leftVelocity = new ArrayList<Double>(Constants.ARRAYLIST_DEFAULT_LENGTH);
-	private ArrayList<Double> rightPosition = new ArrayList<Double>(Constants.ARRAYLIST_DEFAULT_LENGTH);
-	private ArrayList<Double> rightVelocity = new ArrayList<Double>(Constants.ARRAYLIST_DEFAULT_LENGTH);
+	private ArrayList<Double> leftPosition = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Double> leftVelocity = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Double> rightPosition = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Double> rightVelocity = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	private ArrayList<ArrayList<Double>> lists;
 
