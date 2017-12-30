@@ -1,4 +1,4 @@
-package sharkmacro.motionprofiles;
+package org.hammerhead226.sharkmacro.motionprofiles;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,11 +11,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hammerhead226.sharkmacro.Constants;
+
 import com.ctre.CANTalon;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
-
-import sharkmacro.Constants;
 
 public final class ProfileParser {
 

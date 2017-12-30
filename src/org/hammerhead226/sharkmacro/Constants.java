@@ -1,4 +1,4 @@
-package sharkmacro;
+package org.hammerhead226.sharkmacro;
 
 public final class Constants {
 

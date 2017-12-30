@@ -1,4 +1,4 @@
-package sharkmacro.motionprofiles;
+package org.hammerhead226.sharkmacro.motionprofiles;
 
 import java.util.Arrays;
 

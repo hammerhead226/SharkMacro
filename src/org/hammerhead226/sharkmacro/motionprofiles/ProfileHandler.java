@@ -1,10 +1,11 @@
-package sharkmacro.motionprofiles;
+package org.hammerhead226.sharkmacro.motionprofiles;
+
+import org.hammerhead226.sharkmacro.Constants;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.Notifier;
-import sharkmacro.Constants;
 
 public class ProfileHandler {
 

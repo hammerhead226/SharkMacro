@@ -1,10 +1,10 @@
-package sharkmacro.motionprofiles;
+package org.hammerhead226.sharkmacro.motionprofiles;
 
 import java.util.ArrayList;
 
-import com.ctre.CANTalon;
+import org.hammerhead226.sharkmacro.Constants;
 
-import sharkmacro.Constants;
+import com.ctre.CANTalon;
 
 public class Recording {
 
