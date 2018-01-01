@@ -7,7 +7,6 @@ public final class Constants {
 	public static final int PROFILERECORDER_LIST_DEFAULT_LENGTH = 2500;
 
 	public static final String PROFILE_DEFAULT_PREFIX = "profile";
-	public static final String PROFILE_FILE_TYPE = ".csv";
 	public static final String PROFILE_STORAGE_DIRECTORY = "/home/lvuser/profiles";
 	public static final String SMARTDASHBOARD_PROFILE_NAME_KEY = "profilename";
 

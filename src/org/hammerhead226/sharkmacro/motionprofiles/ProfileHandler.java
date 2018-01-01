@@ -7,9 +7,9 @@ import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.Notifier;
 
-public class ProfileHandler {
+public class ProfileHandler implements Cloneable {
 
-	private final double[][] profile;
+	private double[][] profile;
 	private int profileSize;
 	private int gainsProfile;
 	private CANTalon talon;
@@ -153,6 +153,23 @@ public class ProfileHandler {
 	}
 
 	Notifier executorThread;
+	
+	protected Object clone() {
+		try {
+			ProfileHandler p = (ProfileHandler) super.clone();
+			p.profile = this.profile.clone();
+			p.talon = new CANTalon(this.talon.getDeviceID());
+			p.executionState = this.executionState;
+			p.currentMode = this.currentMode;
+			p.status = new CANTalon.MotionProfileStatus();
+			return p;
+		} catch (CloneNotSupportedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Object();
+		}
+		
+	}
 }
 
 enum TalonState {
