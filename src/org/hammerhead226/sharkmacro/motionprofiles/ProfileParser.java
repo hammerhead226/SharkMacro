@@ -33,6 +33,8 @@ public final class ProfileParser extends Parser {
 	}
 
 	public Profile toObject(CANTalon leftTalon, CANTalon rightTalon) {
+		if (inCache()) {
+			return (Profile) ((Profile) getFromCache()).clone();
 		}
 		
 		List<String[]> profileRaw = readFromFile();

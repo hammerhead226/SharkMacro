@@ -11,7 +11,7 @@ import com.ctre.CANTalon;
  * @author Alec Minchington
  *
  */
-public class Profile {
+public class Profile implements Cloneable {
 
 	public final int length;
 	public final int dt;
@@ -22,8 +22,8 @@ public class Profile {
 	private CANTalon leftTalon;
 	private CANTalon rightTalon;
 
-	private final double[][] leftProfile;
-	private final double[][] rightProfile;
+	private double[][] leftProfile;
+	private double[][] rightProfile;
 
 	public Profile(double[][] leftProfile, double[][] rightProfile, CANTalon leftTalon, CANTalon rightTalon) {
 		this.leftProfile = leftProfile;
@@ -93,4 +93,19 @@ public class Profile {
 		return dbl;
 	}
 
+	protected Object clone() {
+		try {
+			Profile p = (Profile) super.clone();
+			p.leftTalon = new CANTalon(this.leftTalon.getDeviceID());
+			p.rightTalon = new CANTalon(this.rightTalon.getDeviceID());
+			p.left = (ProfileHandler) this.left.clone();
+			p.right = (ProfileHandler) this.right.clone();
+			p.leftProfile = this.leftProfile.clone();
+			p.rightProfile = this.rightProfile.clone();
+			return p;
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return new Object();
+	}
 }
