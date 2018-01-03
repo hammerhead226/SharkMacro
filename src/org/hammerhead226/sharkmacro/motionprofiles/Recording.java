@@ -62,8 +62,8 @@ public class Recording {
 		return new Profile(leftProfile, rightProfile, leftTalon, rightTalon);
 	}
 
-	private boolean areEqual(int idx, double comp) {
-		return (recordings.get(0).get(idx) == comp && recordings.get(1).get(idx) == comp
-				&& recordings.get(2).get(idx) == comp && recordings.get(3).get(idx) == comp);
+	private boolean areEqual(int idx, double comparator) {
+		return (recordings.get(0).get(idx) == comparator && recordings.get(1).get(idx) == comparator
+				&& recordings.get(2).get(idx) == comparator && recordings.get(3).get(idx) == comparator);
 	}
 }

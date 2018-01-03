@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.Notifier;
 
 public class ProfileRecorder {
 
-	private final double dt_s = Constants.DT_SECONDS;
 	private boolean isRecording = false;
 
 	private final CANTalon[] talons;
@@ -31,9 +30,8 @@ public class ProfileRecorder {
 	}
 
 	public void start() {
-		// Create new thread running at dt to record encoder readings
 		clear();
-		thread.startPeriodic(dt_s);
+		thread.startPeriodic(Constants.DT_SECONDS);
 		isRecording = true;
 	}
 

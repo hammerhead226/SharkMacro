@@ -17,9 +17,9 @@ import com.opencsv.CSVWriter;
 
 public abstract class Parser {
 
-	String directory;
-	String prefix;
-	final String filename;
+	private final String directory;
+	private final String prefix;
+	private final String filename;
 
 	private static HashMap<String, Object> cache = new HashMap<String, Object>();
 
