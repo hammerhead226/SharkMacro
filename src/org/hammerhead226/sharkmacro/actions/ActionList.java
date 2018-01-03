@@ -14,7 +14,7 @@ public class ActionList implements Iterable<Action>, Cloneable {
 	
 	private Timer timer = new Timer();
 	
-	private boolean finished = false;
+	private boolean isFinished = false;
 
 	public ActionList(ArrayList<Action> list) {
 		this.actionList = list;
@@ -31,13 +31,13 @@ public class ActionList implements Iterable<Action>, Cloneable {
 	}
 	
 	public void execute() {
-		finished = false;
+		isFinished = false;
 		timer.start();
 		thread.startPeriodic(Constants.DT_SECONDS);
 	}
 	
 	public boolean isFinished() {
-		return finished;
+		return isFinished;
 	}
 	
 	class PeriodicRunnable implements java.lang.Runnable {
@@ -52,7 +52,7 @@ public class ActionList implements Iterable<Action>, Cloneable {
 				}
 			}
 			if (actionList.size() == 0) {
-				finished = true;
+				isFinished = true;
 				thread.stop();
 				return;
 			}

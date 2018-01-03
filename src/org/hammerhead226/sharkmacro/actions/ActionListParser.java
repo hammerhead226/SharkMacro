@@ -22,12 +22,12 @@ public class ActionListParser extends Parser {
 			return false;
 		}
 
-		ArrayList<String[]> profileToWrite = new ArrayList<String[]>(al.getSize());
+		ArrayList<String[]> actionListToWrite = new ArrayList<String[]>(al.getSize());
 		for (Action a : al) {
-			profileToWrite.add(a.toStringArray());
+			actionListToWrite.add(a.toStringArray());
 		}
 
-		return super.writeToFile(profileToWrite);
+		return super.writeToFile(actionListToWrite);
 	}
 
 	public ActionList toObject() {

@@ -17,9 +17,9 @@ import com.opencsv.CSVWriter;
 
 public abstract class Parser {
 
-	String directory;
-	String prefix;
-	final String filename;
+	private final String directory;
+	private final String prefix;
+	private final String filename;
 
 	private static HashMap<String, Object> cache = new HashMap<String, Object>();
 
@@ -80,10 +80,10 @@ public abstract class Parser {
 
 	protected List<String[]> readFromFile() {
 		CSVReader reader;
-		List<String[]> profileRaw = new ArrayList<String[]>(0);
+		List<String[]> rawFile = new ArrayList<String[]>(0);
 		try {
 			reader = new CSVReader(new FileReader(filename));
-			profileRaw = reader.readAll();
+			rawFile = reader.readAll();
 			reader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -91,7 +91,7 @@ public abstract class Parser {
 			e.printStackTrace();
 		}
 
-		return profileRaw;
+		return rawFile;
 	}
 
 	public String getNewFilename() {
