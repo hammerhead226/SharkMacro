@@ -7,19 +7,74 @@ import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.Notifier;
 
+/**
+ * Class to easily manage motion profile execution on a Talon SRX.
+ * 
+ * @author Alec Minchington
+ *
+ */
 public class ProfileHandler implements Cloneable {
 
+	/**
+	 * The motion profile to execute.
+	 */
 	private double[][] profile;
+
+	/**
+	 * The length of {@link #profile}.
+	 */
 	private int profileSize;
+
+	/**
+	 * The PID gains profile {@link #talon} will use to execute the motion profile.s
+	 */
 	private int gainsProfile;
+
+	/**
+	 * The Talon used to execute the motion profile.
+	 */
 	private CANTalon talon;
+
+	/**
+	 * The current state of the motion profile execution manager.
+	 * 
+	 * @see ExecutionState
+	 */
 	private ExecutionState executionState;
+
+	/**
+	 * The current state of {@link #talon}.
+	 * 
+	 * @see TalonState
+	 */
 	private TalonState currentMode;
+
+	/**
+	 * Whether the motion profile execution has finished.
+	 */
 	private boolean finished = false;
+
+	/**
+	 * Whether the motion profile execution has started.
+	 */
 	private boolean started = false;
 
+	/**
+	 * The status of {@link #talon}.
+	 */
 	private CANTalon.MotionProfileStatus status = new CANTalon.MotionProfileStatus();
 
+	/**
+	 * Constructs a new {@link MotionProfileHandler} object that will handle the
+	 * execution of {@link #profile} on {@link #talon}.
+	 * 
+	 * @param profile
+	 *            the motion profile to be executed
+	 * @param talon
+	 *            the Talon to execute the profile on
+	 * @param gainsProfile
+	 *            the PID gains profile to use
+	 */
 	public ProfileHandler(final double[][] profile, CANTalon talon, int gainsProfile) {
 		this.profile = profile;
 		this.profileSize = profile.length;
@@ -35,13 +90,16 @@ public class ProfileHandler implements Cloneable {
 	}
 
 	/**
-	 * Call this to start the execution of the motion profile.
+	 * Called to start the execution of the motion profile.
 	 */
 	public void execute() {
 		executorThread.startPeriodic(0.025);
 		started = true;
 	}
 
+	/**
+	 * Called if the motion profile execution needs to be prematurely stopped.
+	 */
 	public void onInterrupt() {
 		bufferThread.stop();
 		executorThread.stop();
@@ -49,7 +107,8 @@ public class ProfileHandler implements Cloneable {
 	}
 
 	/**
-	 * Called periodically while the motion profile is being executed
+	 * Called periodically while the motion profile is being executed. Manages the
+	 * state of the Talon executing the motion profile.
 	 */
 	public void manage() {
 		talon.getMotionProfileStatus(status);
@@ -81,15 +140,22 @@ public class ProfileHandler implements Cloneable {
 		}
 	}
 
+	/**
+	 * Sets the state of {@link #talon}.
+	 * 
+	 * @param t
+	 *            the {@link TalonState} to set the Talon to
+	 */
 	private void setMode(TalonState t) {
 		this.currentMode = t;
 		talon.set(t.getValue());
 	}
 
 	/**
-	 * Fill the Talon's top-level buffer with a given motion profile
+	 * Fill the Talon's top-level buffer with a given motion profile.
 	 * 
 	 * @param gainsProfile
+	 *            the PID gains profile to use to execute the motion profile
 	 */
 	private void fillTalonWithMotionProfile(int gainsProfile) {
 
@@ -118,25 +184,32 @@ public class ProfileHandler implements Cloneable {
 	}
 
 	/**
-	 * @return the status object of the Talon being controlled
+	 * @return the {@link com.ctre.CANTalon.MotionProfileStatus
+	 *         CANTalon.MotionProfileStatus} object of {@link #talon}
 	 */
 	public CANTalon.MotionProfileStatus getStatus() {
 		return status;
 	}
 
+	/**
+	 * @return the {@link TalonState} representing {@link #talon}'s current state
+	 */
 	public TalonState getMode() {
 		return this.currentMode;
 	}
 
 	/**
-	 * @return {@code true} when the motion profile is finished executing
+	 * @return {@code true} when the motion profile is finished executing,
+	 *         {@code false} otherwise
 	 */
 	public boolean isFinished() {
 		return finished;
 	}
 
 	/**
-	 * Class to periodically call processMotionProfileBuffer for the Talon
+	 * Class to periodically call
+	 * {@link com.ctre.CANTalon#processMotionProfileBuffer()
+	 * processMotionProfileBufffer()} for {@link ProfileHandler#talon}.
 	 */
 	class PeriodicBufferProcessor implements java.lang.Runnable {
 		public void run() {
@@ -144,16 +217,34 @@ public class ProfileHandler implements Cloneable {
 		}
 	}
 
+	/**
+	 * Object that takes a runnable class and starts a new thread to call its
+	 * {@link java.lang.Runnable#run() run()} method periodically. This instance
+	 * will handle {@link PeriodicBufferProcessor}.
+	 */
 	Notifier bufferThread;
 
+	/**
+	 * Class to periodically call {@link ProfileHandler#manage()}.
+	 */
 	class PeriodicExecutor implements java.lang.Runnable {
 		public void run() {
 			manage();
 		}
 	}
 
+	/**
+	 * Object that takes a runnable class and starts a new thread to call its
+	 * {@link java.lang.Runnable#run() run()} method periodically. This instance
+	 * will handle {@link PeriodicExecutor}.
+	 */
 	Notifier executorThread;
-	
+
+	/**
+	 * Clones this class and all of its members.
+	 * 
+	 * @return a new copy of this {@link ProfileHandler}
+	 */
 	protected Object clone() {
 		try {
 			ProfileHandler p = (ProfileHandler) super.clone();
@@ -168,25 +259,72 @@ public class ProfileHandler implements Cloneable {
 			e.printStackTrace();
 			return new Object();
 		}
-		
+
 	}
 }
 
+/**
+ * Represents Talon SRX motion profile execution modes.
+ * 
+ * @author Alec Minchington
+ *
+ */
 enum TalonState {
 
+	/**
+	 * The possible states of the Talon while in motion profile execution mode.
+	 * <p>
+	 * {@link #NEUTRAL}: Talon is idle
+	 * <p>
+	 * {@link #EXECUTE}: Talon executes the motion profile contained in its buffer
+	 * <p>
+	 * {@link #HOLD}: Talon holds the current motion profile point
+	 */
 	NEUTRAL(0), EXECUTE(1), HOLD(2);
 
+	/**
+	 * The integer value of each state, passed to
+	 * {@link com.ctre.CANTalon#set(double)} to change the Talon's mode.
+	 */
 	private int value;
 
+	/**
+	 * Construct a new {@link TalonState} with its given integer value.
+	 * 
+	 * @param value
+	 *            the integer value of the {@link TalonState}
+	 */
 	private TalonState(int value) {
 		this.value = value;
 	}
 
+	/**
+	 * @return The integer value of this {@link TalonState}
+	 */
 	public int getValue() {
 		return this.value;
 	}
 }
 
+/**
+ * Enum to help manage the current state of the motion profile execution.
+ * 
+ * @author Alec Minchington
+ *
+ */
 enum ExecutionState {
+
+	/**
+	 * The possible states of motion profile execution.
+	 * <p>
+	 * {@link #WAITING}: The manager is waiting for motion profile execution to
+	 * start
+	 * <p>
+	 * {@link #STARTED}: The manager starts the execution when the Talon's buffer is
+	 * sufficiently filled
+	 * <p>
+	 * {@link #EXECUTING}: The manager waits for execution to finish and then safely
+	 * exits the execution process
+	 */
 	WAITING, STARTED, EXECUTING;
 }
