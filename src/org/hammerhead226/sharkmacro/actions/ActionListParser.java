@@ -5,7 +5,14 @@ import java.util.List;
 
 import org.hammerhead226.sharkmacro.Constants;
 import org.hammerhead226.sharkmacro.Parser;
+import org.hammerhead226.sharkmacro.motionprofiles.Profile;
 
+/**
+ * Handles the reading and writing of {@link ActionList}s.
+ * 
+ * @author Alec Minchington
+ *
+ */
 public class ActionListParser extends Parser {
 
 	/**

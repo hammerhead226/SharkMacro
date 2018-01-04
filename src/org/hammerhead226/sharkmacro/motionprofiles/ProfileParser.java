@@ -10,6 +10,12 @@ import org.hammerhead226.sharkmacro.actions.ActionListParser;
 
 import com.ctre.CANTalon;
 
+/**
+ * Handles the reading and writing of {@link Profile}s.
+ * 
+ * @author Alec Minchington
+ *
+ */
 public final class ProfileParser extends Parser {
 
 	/**

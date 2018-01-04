@@ -8,6 +8,12 @@ import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.Notifier;
 
+/**
+ * Class for recording motion profiles in real time.
+ * 
+ * @author Alec Minchington
+ *
+ */
 public class ProfileRecorder {
 
 	/**
