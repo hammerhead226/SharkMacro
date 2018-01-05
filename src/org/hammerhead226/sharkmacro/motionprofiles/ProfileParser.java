@@ -1,12 +1,11 @@
 package org.hammerhead226.sharkmacro.motionprofiles;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.hammerhead226.sharkmacro.Constants;
 import org.hammerhead226.sharkmacro.Parser;
-import org.hammerhead226.sharkmacro.actions.ActionList;
-import org.hammerhead226.sharkmacro.actions.ActionListParser;
 
 import com.ctre.CANTalon;
 
@@ -17,18 +16,6 @@ import com.ctre.CANTalon;
  *
  */
 public final class ProfileParser extends Parser {
-
-	/**
-	 * Constructs a new {@link ProfileParser} object.
-	 * {@link org.hammerhead226.sharkmacro.Parser#filename Parser.filename} will be
-	 * set to the value of
-	 * {@link org.hammerhead226.sharkmacro.Parser#getNewFilename()
-	 * Parser.getNewFilename()}.
-	 * 
-	 */
-	public ProfileParser() {
-		super(Constants.PROFILE_STORAGE_DIRECTORY, Constants.PROFILE_DEFAULT_PREFIX);
-	}
 
 	/**
 	 * Constructs a new {@link ProfileParser} object.
@@ -103,4 +90,29 @@ public final class ProfileParser extends Parser {
 		return p;
 	}
 
+	/**
+	 * This method generates a new filename to be used for saving a new file. For
+	 * example, if the newest file in the storage directory is
+	 * {@code prefix0003.csv}, the method will return {@code prefix0004.csv}.
+	 * 
+	 * @return a new complete filename in the prefix + number naming convention
+	 */
+	private static String getNewFilename() {
+		return Constants.PROFILE_STORAGE_DIRECTORY + "/" + Constants.PROFILE_DEFAULT_PREFIX
+				+ String.format("%04d",
+						findLatestNumberedFile(Constants.PROFILE_STORAGE_DIRECTORY, Constants.PROFILE_DEFAULT_PREFIX) + 1)
+				+ ".csv";
+	}
+
+	/**
+	 * This method finds the newest file named with prefix + number naming
+	 * convention in the storage directory.
+	 * 
+	 * @return the complete filename of the latest (highest numbered) file in the
+	 *         storage directory
+	 */
+	public static String getNewestFilename() {
+		return Constants.PROFILE_DEFAULT_PREFIX + String.format("%04d",
+				findLatestNumberedFile(Constants.PROFILE_STORAGE_DIRECTORY, Constants.PROFILE_DEFAULT_PREFIX));
+	}
 }

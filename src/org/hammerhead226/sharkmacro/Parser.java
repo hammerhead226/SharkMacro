@@ -51,20 +51,8 @@ public abstract class Parser {
 	 */
 	private static HashMap<String, Object> cache = new HashMap<String, Object>();
 
-	/**
-	 * Constructs a new {@link Parser} object. {@link #filename} will be set to the
-	 * value of {@link #getNewFilename()}.
 	 * 
-	 * @param directory
-	 *            the directory to read or write files to
-	 * @param prefix
-	 *            the prefix to name new files or read existing files with
 	 */
-	public Parser(String directory, String prefix) {
-		this.directory = directory;
-		this.prefix = prefix;
-		this.filename = getNewFilename();
-	}
 
 	/**
 	 * Constructs a new {@link Parser} object.
@@ -182,8 +170,8 @@ public abstract class Parser {
 	 * 
 	 * @return a new complete filename in the prefix + number naming convention
 	 */
-	public String getNewFilename() {
-		return directory + "/" + filename + String.format("%04d", findLatestNumberedFile(prefix) + 1) + ".csv";
+	protected static String getNewFilename(String directory, String prefix) {
+		return directory + "/" + prefix + String.format("%04d", findLatestNumberedFile(directory, prefix) + 1) + ".csv";
 	}
 
 	/**
@@ -193,8 +181,8 @@ public abstract class Parser {
 	 * @return the complete filename of the latest (highest numbered) file in the
 	 *         storage directory
 	 */
-	public String getNewestFilename() {
-		return prefix + String.format("%04d", findLatestNumberedFile(prefix));
+	protected static String getNewestFilename(String directory, String prefix) {
+		return prefix + String.format("%04d", findLatestNumberedFile(directory, prefix));
 	}
 
 	/**
@@ -206,9 +194,9 @@ public abstract class Parser {
 	 *            the string that the file must start with
 	 * @return the number of the newest (highest numbered) file
 	 */
-	private int findLatestNumberedFile(String prefix) {
-		ArrayList<String> str = getFilesWithPrefix();
-		int[] fileNumbers = toNumbers(str);
+	protected static int findLatestNumberedFile(String directory, String prefix) {
+		ArrayList<String> str = getFilesWithPrefix(directory, prefix);
+		int[] fileNumbers = toNumbers(str, prefix);
 		// Find greatest number
 		int greatest = Integer.MIN_VALUE;
 		for (int i : fileNumbers) {
@@ -226,7 +214,7 @@ public abstract class Parser {
 	 * @return an {@link java.util.ArrayList ArrayList} of type String of the files
 	 *         starting with the given prefix
 	 */
-	private ArrayList<String> getFilesWithPrefix() {
+	private static ArrayList<String> getFilesWithPrefix(String directory, String prefix) {
 		final File folder = new File(directory);
 		ArrayList<String> str = new ArrayList<String>(folder.listFiles().length);
 		for (final File fileEntry : folder.listFiles()) {
@@ -247,7 +235,7 @@ public abstract class Parser {
 	 *            list of numbered files
 	 * @return an integer array of the file numbers
 	 */
-	private int[] toNumbers(ArrayList<String> filenames) {
+	private static int[] toNumbers(ArrayList<String> filenames, String prefix) {
 		if (filenames.isEmpty()) {
 			return new int[] { 0 };
 		}
