@@ -36,6 +36,8 @@ public abstract class Parser {
 
 	/**
 	 * Prefix to name or search for files with.
+	 * 
+	 * @deprecated
 	 */
 	private final String prefix;
 
@@ -48,11 +50,10 @@ public abstract class Parser {
 	 * HashMap object representing a cache of all previously loaded
 	 * {@link org.hammerhead226.sharkmacro.motionprofiles.Profile Profiles} and
 	 * {@link org.hammerhead226.sharkmacro.actions.ActionList ActionLists}.
+	 * 
+	 * @deprecated
 	 */
 	private static HashMap<String, Object> cache = new HashMap<String, Object>();
-
-	 * 
-	 */
 
 	/**
 	 * Constructs a new {@link Parser} object.
@@ -79,6 +80,7 @@ public abstract class Parser {
 	 * the filename.
 	 * 
 	 * @return an {@code Object} from the cache
+	 * @deprecated
 	 */
 	protected Object getFromCache() {
 		return cache.get(filename);
@@ -90,6 +92,7 @@ public abstract class Parser {
 	 * 
 	 * @param obj
 	 *            object to put in the cache
+	 * @deprecated
 	 */
 	protected void putInCache(Object obj) {
 		cache.put(filename, obj);
@@ -99,6 +102,7 @@ public abstract class Parser {
 	 * Checks the cache for a a key equal to {@link #filename}.
 	 * 
 	 * @return {@code true} if the cache contains the filename, {@code false} if not
+	 * @deprecated
 	 */
 	protected boolean inCache() {
 		return cache.containsKey(filename);

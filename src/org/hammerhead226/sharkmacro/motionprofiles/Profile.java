@@ -213,6 +213,7 @@ public class Profile implements Cloneable {
 	 * This method clones this class and all of its members.
 	 * 
 	 * @return a new copy of this {@link Profile}
+	 * @deprecated
 	 */
 	protected Object clone() {
 		try {

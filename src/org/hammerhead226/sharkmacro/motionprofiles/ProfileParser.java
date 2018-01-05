@@ -64,10 +64,6 @@ public final class ProfileParser extends Parser {
 	 * @return a new {@code Profile} instance
 	 */
 	public Profile toObject(CANTalon leftTalon, CANTalon rightTalon) {
-		if (inCache()) {
-			return (Profile) ((Profile) getFromCache()).clone();
-		}
-
 		List<String[]> profileRaw = readFromFile();
 
 		// Process read values into Profile

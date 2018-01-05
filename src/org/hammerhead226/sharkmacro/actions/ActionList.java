@@ -123,6 +123,7 @@ public class ActionList implements Iterable<Action>, Cloneable {
 	 * This method clones this class and all of its members.
 	 * 
 	 * @return a new copy of this {@link ActionList}
+	 * @deprecated
 	 */
 	protected Object clone() {
 		try {
