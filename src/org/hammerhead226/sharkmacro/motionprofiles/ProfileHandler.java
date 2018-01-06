@@ -244,7 +244,6 @@ public class ProfileHandler implements Cloneable {
 	 * Clones this class and all of its members.
 	 * 
 	 * @return a new copy of this {@link ProfileHandler}
-	 * @deprecated
 	 */
 	protected Object clone() {
 		try {

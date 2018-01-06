@@ -63,6 +63,10 @@ public class ActionListParser extends Parser {
 	 * @return a new {@code ActionList} instance
 	 */
 	public ActionList toObject() {
+		if (inCache()) {
+			return (ActionList) ((ActionList) getFromCache()).clone();
+		}
+
 		List<String[]> actionListRaw = readFromFile();
 
 		ArrayList<Action> list = new ArrayList<Action>(Constants.ACTIONRECORDER_LIST_DEFAULT_LENGTH);
