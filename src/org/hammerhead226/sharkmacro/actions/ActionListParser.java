@@ -83,10 +83,9 @@ public class ActionListParser extends Parser {
 	 * 
 	 * @return a new complete filename in the prefix + number naming convention
 	 */
-	protected static String getNewFilename() {
-		return Constants.ACTIONLIST_STORAGE_DIRECTORY + "/" + Constants.ACTIONLIST_DEFAULT_PREFIX
-				+ String.format("%04d",
-						findLatestNumberedFile(Constants.ACTIONLIST_STORAGE_DIRECTORY, Constants.ACTIONLIST_DEFAULT_PREFIX) + 1)
+	public static String getNewFilename() {
+		return Constants.ACTIONLIST_DEFAULT_PREFIX + String.format("%04d",
+				findLatestNumberedFile(Constants.ACTIONLIST_STORAGE_DIRECTORY, Constants.ACTIONLIST_DEFAULT_PREFIX) + 1)
 				+ ".csv";
 	}
 
