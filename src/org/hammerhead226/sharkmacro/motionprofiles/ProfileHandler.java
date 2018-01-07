@@ -1,5 +1,7 @@
 package org.hammerhead226.sharkmacro.motionprofiles;
 
+import java.util.Arrays;
+
 import org.hammerhead226.sharkmacro.Constants;
 
 import com.ctre.CANTalon;
@@ -34,6 +36,13 @@ public class ProfileHandler implements Cloneable {
 	 * The Talon used to execute the motion profile.
 	 */
 	private CANTalon talon;
+	
+	/**
+	 * Object that takes a runnable class and starts a new thread to call its
+	 * {@link java.lang.Runnable#run() run()} method periodically. This instance
+	 * will handle {@link PeriodicExecutor}.
+	 */
+	private Notifier executorThread;
 
 	/**
 	 * The current state of the motion profile execution manager.
