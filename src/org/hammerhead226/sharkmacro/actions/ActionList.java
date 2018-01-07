@@ -48,7 +48,7 @@ public class ActionList implements Iterable<Action> {
 	 */
 	public ActionList(ArrayList<Action> list) {
 		this.actionList = list;
-		thread = new Notifier(new PeriodicRunnable());
+		thread = new Notifier(new PeriodicRunnable(this));
 	}
 
 	/**
@@ -95,6 +95,12 @@ public class ActionList implements Iterable<Action> {
 	 * {@link PeriodicRunnable#run() run()} periodically.
 	 */
 	class PeriodicRunnable implements java.lang.Runnable {
+		
+		private ActionList al;
+		
+		public PeriodicRunnable(ActionList al) {
+			this.al = al;
+		}
 
 		/**
 		 * Poll the next {@link Action} in the list to see if it is time to start it. If
@@ -103,17 +109,17 @@ public class ActionList implements Iterable<Action> {
 		 */
 		public void run() {
 			int i = 0;
-			while (i < actionList.size()) {
-				if (actionList.get(i).getStartTime() <= timer.get()) {
-					actionList.get(i).start();
-					actionList.remove(i);
+			while (i < this.al.actionList.size()) {
+				if (this.al.actionList.get(i).getStartTime() <= timer.get()) {
+					this.al.actionList.get(i).start();
+					this.al.actionList.remove(i);
 				} else {
 					i++;
 				}
 			}
-			if (actionList.size() == 0) {
-				isFinished = true;
-				thread.stop();
+			if (this.al.actionList.size() == 0) {
+				this.al.isFinished = true;
+				this.al.thread.stop();
 				return;
 			}
 		}
