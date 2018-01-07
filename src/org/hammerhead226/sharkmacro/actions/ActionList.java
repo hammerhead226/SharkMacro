@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.Timer;
  * @author Alec Minchington
  *
  */
-public class ActionList implements Iterable<Action>, Cloneable {
+public class ActionList implements Iterable<Action> {
 
 	/**
 	 * List that holds the {@link Action}s that make up this {@link ActionList}.
@@ -33,6 +33,12 @@ public class ActionList implements Iterable<Action>, Cloneable {
 	 * Represents whether this {@link ActionList} has finished executing.
 	 */
 	private boolean isFinished = false;
+	
+	/**
+	 * Object that takes a runnable class and starts a new thread to call its
+	 * {@link java.lang.Runnable#run() run()} method periodically.
+	 */
+	private Notifier thread;
 
 	/**
 	 * Constructs a new {@link ActionList} object.
@@ -114,26 +120,8 @@ public class ActionList implements Iterable<Action>, Cloneable {
 	}
 
 	/**
-	 * Object that takes a runnable class and starts a new thread to call its
-	 * {@link java.lang.Runnable#run() run()} method periodically.
-	 */
-	Notifier thread;
-
-	/**
-	 * This method clones this class and all of its members.
 	 * 
-	 * @return a new copy of this {@link ActionList}
 	 */
-	protected Object clone() {
-		try {
-			ActionList al = (ActionList) super.clone();
-			al.actionList = (ArrayList<Action>) this.actionList.clone();
-			al.timer = new Timer();
-			return al;
-		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		return new Object();
 	}
 }

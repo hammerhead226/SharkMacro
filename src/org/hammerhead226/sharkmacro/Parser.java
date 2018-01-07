@@ -49,10 +49,7 @@ public abstract class Parser {
 	 * {@link org.hammerhead226.sharkmacro.motionprofiles.Profile Profiles} and
 	 * {@link org.hammerhead226.sharkmacro.actions.ActionList ActionLists}.
 	 */
-	private static HashMap<String, Object> cache = new HashMap<String, Object>();
-
-	 * 
-	 */
+	private static HashMap<String, List<String[]>> cache = new HashMap<String, List<String[]>>();
 
 	/**
 	 * Constructs a new {@link Parser} object.
@@ -72,36 +69,6 @@ public abstract class Parser {
 			filename += ".csv";
 		}
 		this.filename = directory + "/" + filename;
-	}
-
-	/**
-	 * Gets the {@link java.lang.Object Object} corresponding to the key equal to
-	 * the filename.
-	 * 
-	 * @return an {@code Object} from the cache
-	 */
-	protected Object getFromCache() {
-		return cache.get(filename);
-	}
-
-	/**
-	 * Adds a key/value pair to the cache with the filename as the key and
-	 * {@code obj} as the value.
-	 * 
-	 * @param obj
-	 *            object to put in the cache
-	 */
-	protected void putInCache(Object obj) {
-		cache.put(filename, obj);
-	}
-
-	/**
-	 * Checks the cache for a a key equal to {@link #filename}.
-	 * 
-	 * @return {@code true} if the cache contains the filename, {@code false} if not
-	 */
-	protected boolean inCache() {
-		return cache.containsKey(filename);
 	}
 
 	/**
@@ -148,6 +115,10 @@ public abstract class Parser {
 	 * @return a list representing the contents of the read file
 	 */
 	protected List<String[]> readFromFile() {
+		if (cache.containsKey(filename)) {
+			return cache.get(filename);
+		}
+		
 		CSVReader reader;
 		List<String[]> rawFile = new ArrayList<String[]>(0);
 		try {
@@ -159,6 +130,8 @@ public abstract class Parser {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		cache.put(filename, rawFile);
 
 		return rawFile;
 	}

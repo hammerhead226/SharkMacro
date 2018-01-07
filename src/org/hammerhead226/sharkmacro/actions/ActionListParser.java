@@ -63,9 +63,6 @@ public class ActionListParser extends Parser {
 	 * @return a new {@code ActionList} instance
 	 */
 	public ActionList toObject() {
-		if (inCache()) {
-			return (ActionList) ((ActionList) getFromCache()).clone();
-		}
 
 		List<String[]> actionListRaw = readFromFile();
 
@@ -75,7 +72,6 @@ public class ActionListParser extends Parser {
 		}
 
 		ActionList al = new ActionList(list);
-		putInCache(al);
 
 		return al;
 	}
