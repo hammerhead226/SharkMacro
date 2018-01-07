@@ -126,8 +126,17 @@ public class ActionList implements Iterable<Action> {
 	}
 
 	/**
+	 * String representation of each {@link Action} contained in this {@link ActionList}.
 	 * 
+	 * @return the string representation
 	 */
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (Action a : actionList) {
+			sb.append(a.toString());
+			sb.append("\n");
+			sb.append("\n");
 		}
+		return sb.toString();
 	}
 }

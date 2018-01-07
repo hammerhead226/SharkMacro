@@ -116,4 +116,19 @@ public final class Action {
 	public double getEndTime() {
 		return this.endTime;
 	}
+
+	/**
+	 * Generates a string representation of this {@link Action}.
+	 * 
+	 * @return the string representation
+	 */
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(commandName);
+		sb.append("\n");
+		sb.append(startTime);
+		sb.append("\n");
+		sb.append(endTime);
+		return sb.toString();
+	}
 }
