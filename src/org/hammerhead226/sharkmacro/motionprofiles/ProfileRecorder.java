@@ -50,6 +50,12 @@ public class ProfileRecorder {
 	 * A list of the lists holding the Talons' positions and velocities.
 	 */
 	private ArrayList<ArrayList<Double>> lists;
+	
+	/**
+	 * Object that takes a runnable class and starts a new thread to call its
+	 * {@link java.lang.Runnable#run() run()} method periodically.
+	 */
+	Notifier thread;
 
 	/**
 	 * Construct a new {@link ProfileRecorder} object.
@@ -132,11 +138,5 @@ public class ProfileRecorder {
 			rightVelocity.add(talons[1].getSpeed());
 		}
 	}
-
-	/**
-	 * Object that takes a runnable class and starts a new thread to call its
-	 * {@link java.lang.Runnable#run() run()} method periodically.
-	 */
-	Notifier thread;
 
 }
