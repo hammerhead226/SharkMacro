@@ -1,5 +1,7 @@
 package org.hammerhead226.sharkmacro.motionprofiles;
 
+import java.util.Arrays;
+
 import org.hammerhead226.sharkmacro.Constants;
 
 import com.ctre.CANTalon;
@@ -34,6 +36,13 @@ public class ProfileHandler implements Cloneable {
 	 * The Talon used to execute the motion profile.
 	 */
 	private CANTalon talon;
+	
+	/**
+	 * Object that takes a runnable class and starts a new thread to call its
+	 * {@link java.lang.Runnable#run() run()} method periodically. This instance
+	 * will handle {@link PeriodicExecutor}.
+	 */
+	private Notifier executorThread;
 
 	/**
 	 * The current state of the motion profile execution manager.
@@ -233,34 +242,6 @@ public class ProfileHandler implements Cloneable {
 		}
 	}
 
-	/**
-	 * Object that takes a runnable class and starts a new thread to call its
-	 * {@link java.lang.Runnable#run() run()} method periodically. This instance
-	 * will handle {@link PeriodicExecutor}.
-	 */
-	Notifier executorThread;
-
-	/**
-	 * Clones this class and all of its members.
-	 * 
-	 * @return a new copy of this {@link ProfileHandler}
-	 */
-	protected Object clone() {
-		try {
-			ProfileHandler p = (ProfileHandler) super.clone();
-			p.profile = this.profile.clone();
-			p.talon = new CANTalon(this.talon.getDeviceID());
-			p.executionState = this.executionState;
-			p.currentMode = this.currentMode;
-			p.status = new CANTalon.MotionProfileStatus();
-			return p;
-		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return new Object();
-		}
-
-	}
 }
 
 /**

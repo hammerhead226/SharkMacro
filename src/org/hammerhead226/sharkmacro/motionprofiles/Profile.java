@@ -11,7 +11,7 @@ import com.ctre.CANTalon;
  * @author Alec Minchington
  *
  */
-public class Profile implements Cloneable {
+public class Profile {
 
 	/**
 	 * The number of points in both {@link #leftProfile} and {@link #rightProfile}.
@@ -209,24 +209,4 @@ public class Profile implements Cloneable {
 		return dbl;
 	}
 
-	/**
-	 * This method clones this class and all of its members.
-	 * 
-	 * @return a new copy of this {@link Profile}
-	 */
-	protected Object clone() {
-		try {
-			Profile p = (Profile) super.clone();
-			p.leftTalon = new CANTalon(this.leftTalon.getDeviceID());
-			p.rightTalon = new CANTalon(this.rightTalon.getDeviceID());
-			p.left = (ProfileHandler) this.left.clone();
-			p.right = (ProfileHandler) this.right.clone();
-			p.leftProfile = this.leftProfile.clone();
-			p.rightProfile = this.rightProfile.clone();
-			return p;
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return new Object();
-	}
 }

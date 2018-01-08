@@ -21,7 +21,6 @@ public final class Constants {
 
 	public static final String PROFILE_DEFAULT_PREFIX = "profile";
 	public static final String PROFILE_STORAGE_DIRECTORY = "/home/lvuser/profiles";
-	public static final String SMARTDASHBOARD_PROFILE_NAME_KEY = "profilename";
 
 	public static final int MINIMUM_POINTS_IN_TALON = 5;
 

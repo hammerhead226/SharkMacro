@@ -49,22 +49,7 @@ public abstract class Parser {
 	 * {@link org.hammerhead226.sharkmacro.motionprofiles.Profile Profiles} and
 	 * {@link org.hammerhead226.sharkmacro.actions.ActionList ActionLists}.
 	 */
-	private static HashMap<String, Object> cache = new HashMap<String, Object>();
-
-	/**
-	 * Constructs a new {@link Parser} object. {@link #filename} will be set to the
-	 * value of {@link #getNewFilename()}.
-	 * 
-	 * @param directory
-	 *            the directory to read or write files to
-	 * @param prefix
-	 *            the prefix to name new files or read existing files with
-	 */
-	public Parser(String directory, String prefix) {
-		this.directory = directory;
-		this.prefix = prefix;
-		this.filename = getNewFilename();
-	}
+	private static HashMap<String, List<String[]>> cache = new HashMap<String, List<String[]>>();
 
 	/**
 	 * Constructs a new {@link Parser} object.
@@ -84,36 +69,6 @@ public abstract class Parser {
 			filename += ".csv";
 		}
 		this.filename = directory + "/" + filename;
-	}
-
-	/**
-	 * Gets the {@link java.lang.Object Object} corresponding to the key equal to
-	 * the filename.
-	 * 
-	 * @return an {@code Object} from the cache
-	 */
-	protected Object getFromCache() {
-		return cache.get(filename);
-	}
-
-	/**
-	 * Adds a key/value pair to the cache with the filename as the key and
-	 * {@code obj} as the value.
-	 * 
-	 * @param obj
-	 *            object to put in the cache
-	 */
-	protected void putInCache(Object obj) {
-		cache.put(filename, obj);
-	}
-
-	/**
-	 * Checks the cache for a a key equal to {@link #filename}.
-	 * 
-	 * @return {@code true} if the cache contains the filename, {@code false} if not
-	 */
-	protected boolean inCache() {
-		return cache.containsKey(filename);
 	}
 
 	/**
@@ -160,6 +115,10 @@ public abstract class Parser {
 	 * @return a list representing the contents of the read file
 	 */
 	protected List<String[]> readFromFile() {
+		if (cache.containsKey(filename)) {
+			return cache.get(filename);
+		}
+		
 		CSVReader reader;
 		List<String[]> rawFile = new ArrayList<String[]>(0);
 		try {
@@ -171,6 +130,8 @@ public abstract class Parser {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		cache.put(filename, rawFile);
 
 		return rawFile;
 	}
@@ -182,8 +143,8 @@ public abstract class Parser {
 	 * 
 	 * @return a new complete filename in the prefix + number naming convention
 	 */
-	public String getNewFilename() {
-		return directory + "/" + filename + String.format("%04d", findLatestNumberedFile(prefix) + 1) + ".csv";
+	protected static String getNewFilename(String directory, String prefix) {
+		return prefix + String.format("%04d", findLatestNumberedFile(directory, prefix) + 1) + ".csv";
 	}
 
 	/**
@@ -193,8 +154,8 @@ public abstract class Parser {
 	 * @return the complete filename of the latest (highest numbered) file in the
 	 *         storage directory
 	 */
-	public String getNewestFilename() {
-		return prefix + String.format("%04d", findLatestNumberedFile(prefix));
+	protected static String getNewestFilename(String directory, String prefix) {
+		return prefix + String.format("%04d", findLatestNumberedFile(directory, prefix));
 	}
 
 	/**
@@ -206,9 +167,9 @@ public abstract class Parser {
 	 *            the string that the file must start with
 	 * @return the number of the newest (highest numbered) file
 	 */
-	private int findLatestNumberedFile(String prefix) {
-		ArrayList<String> str = getFilesWithPrefix();
-		int[] fileNumbers = toNumbers(str);
+	protected static int findLatestNumberedFile(String directory, String prefix) {
+		ArrayList<String> str = getFilesWithPrefix(directory, prefix);
+		int[] fileNumbers = toNumbers(str, prefix);
 		// Find greatest number
 		int greatest = Integer.MIN_VALUE;
 		for (int i : fileNumbers) {
@@ -226,7 +187,7 @@ public abstract class Parser {
 	 * @return an {@link java.util.ArrayList ArrayList} of type String of the files
 	 *         starting with the given prefix
 	 */
-	private ArrayList<String> getFilesWithPrefix() {
+	private static ArrayList<String> getFilesWithPrefix(String directory, String prefix) {
 		final File folder = new File(directory);
 		ArrayList<String> str = new ArrayList<String>(folder.listFiles().length);
 		for (final File fileEntry : folder.listFiles()) {
@@ -247,7 +208,7 @@ public abstract class Parser {
 	 *            list of numbered files
 	 * @return an integer array of the file numbers
 	 */
-	private int[] toNumbers(ArrayList<String> filenames) {
+	private static int[] toNumbers(ArrayList<String> filenames, String prefix) {
 		if (filenames.isEmpty()) {
 			return new int[] { 0 };
 		}
