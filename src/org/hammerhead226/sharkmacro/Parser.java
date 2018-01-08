@@ -144,7 +144,7 @@ public abstract class Parser {
 	 * @return a new complete filename in the prefix + number naming convention
 	 */
 	protected static String getNewFilename(String directory, String prefix) {
-		return directory + "/" + prefix + String.format("%04d", findLatestNumberedFile(directory, prefix) + 1) + ".csv";
+		return prefix + String.format("%04d", findLatestNumberedFile(directory, prefix) + 1) + ".csv";
 	}
 
 	/**
