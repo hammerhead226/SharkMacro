@@ -134,8 +134,6 @@ public class ActionList implements Iterable<Action> {
 		StringBuilder sb = new StringBuilder();
 		for (Action a : actionList) {
 			sb.append(a.toString());
-			sb.append("\n");
-			sb.append("\n");
 		}
 		return sb.toString();
 	}
