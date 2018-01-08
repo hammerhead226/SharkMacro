@@ -93,9 +93,7 @@ public final class ProfileParser extends Parser {
 	 * @return a new complete filename in the prefix + number naming convention
 	 */
 	public static String getNewFilename() {
-		return Constants.PROFILE_DEFAULT_PREFIX + String.format("%04d",
-				findLatestNumberedFile(Constants.PROFILE_STORAGE_DIRECTORY, Constants.PROFILE_DEFAULT_PREFIX) + 1)
-				+ ".csv";
+		return getNewFilename(Constants.PROFILE_STORAGE_DIRECTORY, Constants.PROFILE_DEFAULT_PREFIX);
 	}
 
 	/**
@@ -106,7 +104,6 @@ public final class ProfileParser extends Parser {
 	 *         storage directory
 	 */
 	public static String getNewestFilename() {
-		return Constants.PROFILE_DEFAULT_PREFIX + String.format("%04d",
-				findLatestNumberedFile(Constants.PROFILE_STORAGE_DIRECTORY, Constants.PROFILE_DEFAULT_PREFIX));
+		return getNewestFilename(Constants.PROFILE_STORAGE_DIRECTORY, Constants.PROFILE_DEFAULT_PREFIX);
 	}
 }
