@@ -6,18 +6,58 @@ import org.hammerhead226.sharkmacro.Constants;
 
 import com.ctre.CANTalon;
 
+/**
+ * Intermediary class that represents a raw recording of a motion profile. 
+ * 
+ * @author Alec Minchington
+ *
+ */
 public class Recording {
 
+	/**
+	 * A list containing the lists of recorded positions and velocities.
+	 */
 	private ArrayList<ArrayList<Double>> recordings;
+
+	/**
+	 * Left Talon to pass to the {@link Profile} generated in {@link #toProfile()}.
+	 */
 	private CANTalon leftTalon;
+
+	/**
+	 * Right Talon to pass to the {@link Profile} generated in {@link #toProfile()}.
+	 */
 	private CANTalon rightTalon;
 
+	/**
+	 * Constructs a new {@link Recording} object.
+	 * 
+	 * @param recordings
+	 *            a list containing the lists of recorded positions and velocities
+	 * @param leftTalon
+	 *            Talon used to record left position and velocity, passed from
+	 *            {@link ProfileRecorder#stop()}
+	 * @param rightTalon
+	 *            Talon used to record right position and velocity, passed from
+	 *            {@link ProfileRecorder#stop()}
+	 */
 	public Recording(ArrayList<ArrayList<Double>> recordings, CANTalon leftTalon, CANTalon rightTalon) {
 		this.recordings = recordings;
 		this.leftTalon = leftTalon;
 		this.rightTalon = rightTalon;
 	}
 
+	/**
+	 * Transforms the raw recorded positions and velocities into a Talon-formatted
+	 * motion profile. Each point in the motion profile is formatted as follows:
+	 * <p>
+	 * <center>
+	 * {@code [ <position in rotations>, <velocity in RPM>, <time for the Talon to hold this point> ]}
+	 * </center>
+	 * </p>
+	 * 
+	 * @return a new {@link Profile} containing the new motion profiles
+	 */
 	public Profile toProfile() {
 
 		// Remove differential in list size
@@ -62,6 +102,16 @@ public class Recording {
 		return new Profile(leftProfile, rightProfile, leftTalon, rightTalon);
 	}
 
+	/**
+	 * Compares the positions and velocities at a given instant in time.
+	 * 
+	 * @param idx
+	 *            list index to get comparable values from
+	 * @param comparator
+	 *            value to compare the positions and velocities to
+	 * @return {@code true} if all four positions and velocities are equal to the
+	 *         comparator, {@code false} otherwise
+	 */
 	private boolean areEqual(int idx, double comparator) {
 		return (recordings.get(0).get(idx) == comparator && recordings.get(1).get(idx) == comparator
 				&& recordings.get(2).get(idx) == comparator && recordings.get(3).get(idx) == comparator);
