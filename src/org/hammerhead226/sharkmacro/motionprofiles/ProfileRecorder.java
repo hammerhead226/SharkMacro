@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.hammerhead226.sharkmacro.Constants;
 
 import com.ctre.CANTalon;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.Notifier;
 
@@ -24,32 +25,32 @@ public class ProfileRecorder {
 	/**
 	 * An array of the Talons being recorded.
 	 */
-	private final CANTalon[] talons;
+	private final TalonSRX[] talons;
 
 	/**
 	 * Holds the recorded positions of the left Talon.
 	 */
-	private ArrayList<Double> leftPosition = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Integer> leftPosition = new ArrayList<Integer>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	/**
 	 * Holds the recorded velocities of the left Talon.
 	 */
-	private ArrayList<Double> leftVelocity = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Integer> leftVelocity = new ArrayList<Integer>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	/**
 	 * Holds the recorded positions of the right Talon.
 	 */
-	private ArrayList<Double> rightPosition = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Integer> rightPosition = new ArrayList<Integer>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	/**
 	 * Holds the recorded velocities of the right Talon.
 	 */
-	private ArrayList<Double> rightVelocity = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Integer> rightVelocity = new ArrayList<Integer>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	/**
 	 * A list of the lists holding the Talons' positions and velocities.
 	 */
-	private ArrayList<ArrayList<Double>> lists;
+	private ArrayList<ArrayList<Integer>> lists;
 	
 	/**
 	 * Object that takes a runnable class and starts a new thread to call its
@@ -65,8 +66,8 @@ public class ProfileRecorder {
 	 * @param right
 	 *            the right Talon
 	 */
-	public ProfileRecorder(CANTalon left, CANTalon right) {
-		talons = new CANTalon[] { left, right };
+	public ProfileRecorder(TalonSRX left, TalonSRX right) {
+		talons = new TalonSRX[] { left, right };
 		thread = new Notifier(new PeriodicRunnable());
 	}
 
@@ -89,7 +90,7 @@ public class ProfileRecorder {
 		// Stop recording encoder readings
 		thread.stop();
 
-		lists = new ArrayList<ArrayList<Double>>() {
+		lists = new ArrayList<ArrayList<Integer>>() {
 			{
 				add(leftPosition);
 				add(leftVelocity);
@@ -131,11 +132,11 @@ public class ProfileRecorder {
 		 * Add position and velocity readings from the Talons to their respective list.
 		 */
 		public void run() {
-			leftPosition.add(talons[0].getPosition());
-			leftVelocity.add(talons[0].getSpeed());
+			leftPosition.add(talons[0].getSelectedSensorPosition(0));
+			leftVelocity.add(talons[0].getSelectedSensorVelocity(0));
 
-			rightPosition.add(talons[1].getPosition());
-			rightVelocity.add(talons[1].getSpeed());
+			rightPosition.add(talons[1].getSelectedSensorPosition(0));
+			rightVelocity.add(talons[1].getSelectedSensorVelocity(0));
 		}
 	}
 

@@ -3,6 +3,9 @@ package org.hammerhead226.sharkmacro.motionprofiles;
 import java.util.Arrays;
 
 import com.ctre.CANTalon;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * Class representation of a motion profile. Formatted to work with Talon SRX
@@ -37,12 +40,12 @@ public class Profile {
 	/**
 	 * the Talon to execute the left profile with
 	 */
-	private CANTalon leftTalon;
+	private TalonSRX leftTalon;
 
 	/**
 	 * the Talon to execute the right profile with
 	 */
-	private CANTalon rightTalon;
+	private TalonSRX rightTalon;
 
 	/**
 	 * The left motion profile.
@@ -66,7 +69,7 @@ public class Profile {
 	 * @param rightTalon
 	 *            the Talon to execute the right profile with
 	 */
-	public Profile(double[][] leftProfile, double[][] rightProfile, CANTalon leftTalon, CANTalon rightTalon) {
+	public Profile(double[][] leftProfile, double[][] rightProfile, TalonSRX leftTalon, TalonSRX rightTalon) {
 		this.leftProfile = leftProfile;
 		this.rightProfile = rightProfile;
 		this.leftTalon = leftTalon;
@@ -89,7 +92,7 @@ public class Profile {
 	 * @param rightTalon
 	 *            the Talon to execute the right profile with
 	 */
-	public Profile(String[][] leftProfile, String[][] rightProfile, CANTalon leftTalon, CANTalon rightTalon) {
+	public Profile(String[][] leftProfile, String[][] rightProfile, TalonSRX leftTalon, TalonSRX rightTalon) {
 		this.leftProfile = toDoubleArray(leftProfile);
 		this.rightProfile = toDoubleArray(rightProfile);
 		this.leftTalon = leftTalon;
