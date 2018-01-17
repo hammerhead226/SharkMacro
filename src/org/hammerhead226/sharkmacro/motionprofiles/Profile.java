@@ -124,8 +124,16 @@ public class Profile {
 	 * profile's execution is interrupted.
 	 */
 	public void onInterrupt() {
-		left.onInterrupt();
-		right.onInterrupt();
+		if (left != null) {
+			left.onInterrupt();
+		} else {
+			DriverStation.getInstance().reportError("Tried to interrupt null instance of left ProfileHandler!", false);
+		}
+		if (right != null) {
+			right.onInterrupt();
+		} else {
+			DriverStation.getInstance().reportError("Tried to interrupt null instance of right ProfileHandler!", false);
+		}
 	}
 
 	/**
