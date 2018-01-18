@@ -81,6 +81,8 @@ public abstract class Parser {
 	 *         able to be written.
 	 */
 	protected boolean writeToFile(ArrayList<String[]> data) {
+		touchDirectory(directory);
+		
 		CSVWriter writer;
 		try {
 			writer = new CSVWriter(new FileWriter(filename), Constants.SEPARATOR, Constants.QUOTECHAR,
@@ -132,7 +134,7 @@ public abstract class Parser {
 	 * @return a new complete filename in the prefix + number naming convention
 	 */
 	protected static String getNewFilename(String directory, String prefix) {
-		checkDirectory(directory);
+		touchDirectory(directory);
 		return prefix + String.format("%04d", findLatestNumberedFile(directory, prefix) + 1) + ".csv";
 	}
 
@@ -144,7 +146,7 @@ public abstract class Parser {
 	 *         storage directory
 	 */
 	protected static String getNewestFilename(String directory, String prefix) {
-		checkDirectory(directory);
+		touchDirectory(directory);
 		return prefix + String.format("%04d", findLatestNumberedFile(directory, prefix));
 	}
 
@@ -220,7 +222,7 @@ public abstract class Parser {
 	 * @return {@code true} if the directory already exists or was successfully
 	 *         created, {@code false} if an exception was thrown
 	 */
-	private static boolean checkDirectory(String directory) {
+	private static boolean touchDirectory(String directory) {
 		Path p = Paths.get(directory);
 		if (Files.notExists(p)) {
 			try {
