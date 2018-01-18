@@ -139,12 +139,10 @@ public class Recording {
 	 * 
 	 * @param rawUnits
 	 *            raw sensor units
-	 * @param sensorUnitsPerRotation
-	 *            amount of raw units per wheel rotation
 	 * @return raw units as wheel rotations
 	 */
-	private double toRotations(double rawUnits, double sensorUnitsPerRotation) {
-		return rawUnits * (1.0 / sensorUnitsPerRotation);
+	private double toRotations(double rawUnits) {
+		return rawUnits * (1.0 / Constants.ENCODER_COUNTS_PER_REV);
 	}
 
 	/**
@@ -152,11 +150,9 @@ public class Recording {
 	 * 
 	 * @param rawUnitsPer100ms
 	 *            raw sensor units
-	 * @param sensorUnitsPerRotation
-	 *            amount of raw units per wheel rotation
 	 * @return raw units per 100ms as RPM
 	 */
-	private double toRPM(double rawUnitsPer100ms, double sensorUnitsPerRotation) {
-		return rawUnitsPer100ms * (600.0 / sensorUnitsPerRotation);
+	private double toRPM(double rawUnitsPer100ms) {
+		return rawUnitsPer100ms * (600.0 / Constants.ENCODER_COUNTS_PER_REV);
 	}
 }
