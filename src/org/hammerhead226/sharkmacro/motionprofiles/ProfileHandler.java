@@ -166,11 +166,11 @@ public class ProfileHandler implements Cloneable {
 	 * Sets the state of {@link #talon}.
 	 * 
 	 * @param t
-	 *            the {@link TalonState} to set the Talon to
+	 *            the motion profile mode to set the Talon to
 	 */
-	private void setMode(SetValueMotionProfile v) {
-		this.currentMode = v;
-		talon.set(ControlMode.MotionProfile, v.value);
+	private void setMode(SetValueMotionProfile mode) {
+		this.currentMode = mode;
+		talon.set(ControlMode.MotionProfile, mode.value);
 	}
 
 	/**
