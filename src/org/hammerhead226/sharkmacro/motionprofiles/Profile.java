@@ -127,12 +127,12 @@ public class Profile {
 		if (left != null) {
 			left.onInterrupt();
 		} else {
-			DriverStation.getInstance().reportError("Tried to interrupt null instance of left ProfileHandler!", false);
+			DriverStation.getInstance().reportWarning("No left instance of ProfileHandler to interrupt!", false);
 		}
 		if (right != null) {
 			right.onInterrupt();
 		} else {
-			DriverStation.getInstance().reportError("Tried to interrupt null instance of right ProfileHandler!", false);
+			DriverStation.getInstance().reportWarning("No right instance of ProfileHandler to interrupt!", false);
 		}
 	}
 
