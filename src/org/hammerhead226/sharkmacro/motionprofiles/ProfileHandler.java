@@ -1,16 +1,22 @@
 package org.hammerhead226.sharkmacro.motionprofiles;
 
-import java.util.Arrays;
-
 import org.hammerhead226.sharkmacro.Constants;
 
-import com.ctre.CANTalon;
-import com.ctre.CANTalon.TalonControlMode;
+import com.ctre.phoenix.motion.MotionProfileStatus;
+import com.ctre.phoenix.motion.SetValueMotionProfile;
+import com.ctre.phoenix.motion.TrajectoryPoint;
+import com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- * Class to easily manage motion profile execution on a Talon SRX.
+ * Class to easily manage motion profile execution on a Talon SRX. Some logic
+ * taken from <a href=
+ * "https://github.com/CrossTheRoadElec/Phoenix-Examples-Languages/blob/master/Java/MotionProfile/src/org/usfirst/frc/team217/robot/MotionProfileExample.java">here</a>
  * 
  * @author Alec Minchington
  *
@@ -35,8 +41,8 @@ public class ProfileHandler implements Cloneable {
 	/**
 	 * The Talon used to execute the motion profile.
 	 */
-	private CANTalon talon;
-	
+	private TalonSRX talon;
+
 	/**
 	 * Object that takes a runnable class and starts a new thread to call its
 	 * {@link java.lang.Runnable#run() run()} method periodically. This instance
@@ -56,7 +62,7 @@ public class ProfileHandler implements Cloneable {
 	 * 
 	 * @see TalonState
 	 */
-	private TalonState currentMode;
+	private SetValueMotionProfile currentMode;
 
 	/**
 	 * Whether the motion profile execution has finished.
@@ -71,7 +77,7 @@ public class ProfileHandler implements Cloneable {
 	/**
 	 * The status of {@link #talon}.
 	 */
-	private CANTalon.MotionProfileStatus status = new CANTalon.MotionProfileStatus();
+	private MotionProfileStatus status = new MotionProfileStatus();
 
 	/**
 	 * Constructs a new {@link MotionProfileHandler} object that will handle the
@@ -84,7 +90,7 @@ public class ProfileHandler implements Cloneable {
 	 * @param gainsProfile
 	 *            the PID gains profile to use
 	 */
-	public ProfileHandler(final double[][] profile, CANTalon talon, int gainsProfile) {
+	public ProfileHandler(final double[][] profile, TalonSRX talon, int gainsProfile) {
 		this.profile = profile;
 		this.profileSize = profile.length;
 		this.talon = talon;
@@ -112,7 +118,18 @@ public class ProfileHandler implements Cloneable {
 	public void onInterrupt() {
 		bufferThread.stop();
 		executorThread.stop();
-		setMode(TalonState.NEUTRAL);
+		setMode(SetValueMotionProfile.Disable);
+	}
+
+	/**
+	 * Called after motion profile execution has finished.
+	 */
+	private void onFinish() {
+		finished = true;
+		bufferThread.stop();
+		executorThread.stop();
+		setMode(SetValueMotionProfile.Disable);
+		talon.clearMotionProfileTrajectories();
 	}
 
 	/**
@@ -126,24 +143,20 @@ public class ProfileHandler implements Cloneable {
 		case WAITING:
 			if (started) {
 				started = false;
-				setMode(TalonState.NEUTRAL);
-				talon.changeControlMode(TalonControlMode.MotionProfile);
+				setMode(SetValueMotionProfile.Disable);
 				fillTalonWithMotionProfile(gainsProfile);
 				executionState = ExecutionState.STARTED;
 			}
 			break;
 		case STARTED:
 			if (status.btmBufferCnt > Constants.MINIMUM_POINTS_IN_TALON) {
-				setMode(TalonState.EXECUTE);
+				setMode(SetValueMotionProfile.Enable);
 				executionState = ExecutionState.EXECUTING;
 			}
 			break;
 		case EXECUTING:
-			if (status.activePointValid && status.activePoint.isLastPoint) {
-				setMode(TalonState.NEUTRAL);
-				bufferThread.stop();
-				executorThread.stop();
-				finished = true;
+			if (status.activePointValid && status.isLast) {
+				onFinish();
 			}
 			break;
 		}
@@ -153,11 +166,11 @@ public class ProfileHandler implements Cloneable {
 	 * Sets the state of {@link #talon}.
 	 * 
 	 * @param t
-	 *            the {@link TalonState} to set the Talon to
+	 *            the motion profile mode to set the Talon to
 	 */
-	private void setMode(TalonState t) {
-		this.currentMode = t;
-		talon.set(t.getValue());
+	private void setMode(SetValueMotionProfile mode) {
+		this.currentMode = mode;
+		talon.set(ControlMode.MotionProfile, mode.value);
 	}
 
 	/**
@@ -168,16 +181,18 @@ public class ProfileHandler implements Cloneable {
 	 */
 	private void fillTalonWithMotionProfile(int gainsProfile) {
 
-		CANTalon.TrajectoryPoint point = new CANTalon.TrajectoryPoint();
+		TrajectoryPoint point = new TrajectoryPoint();
 
 		talon.clearMotionProfileTrajectories();
+		talon.configMotionProfileTrajectoryPeriod(TrajectoryDuration.Trajectory_Duration_0ms.value, 0);
 
 		for (int i = 0; i < profileSize; ++i) {
 			point.position = profile[i][0];
 			point.velocity = profile[i][1];
-			point.timeDurMs = (int) profile[i][2];
-			point.profileSlotSelect = gainsProfile;
-			point.velocityOnly = false;
+			point.headingDeg = 0;
+			point.timeDur = toTrajectoryDuration((int) profile[i][2]);
+			point.profileSlotSelect0 = gainsProfile;
+			point.profileSlotSelect1 = 0;
 			point.zeroPos = false;
 			if (i == 0) {
 				point.zeroPos = true;
@@ -193,17 +208,37 @@ public class ProfileHandler implements Cloneable {
 	}
 
 	/**
+	 * Converts an integer time value into a
+	 * {@link com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration
+	 * TrajectoryDuration}.
+	 * 
+	 * @param durationMs
+	 *            time duration of the trajectory
+	 * @return {@code TrajectoryDuration} with the value of the passed duration
+	 */
+	private TrajectoryDuration toTrajectoryDuration(int durationMs) {
+		TrajectoryDuration dur = TrajectoryDuration.Trajectory_Duration_0ms;
+		dur = dur.valueOf(durationMs);
+		if (dur.value != durationMs) {
+			DriverStation.getInstance();
+			DriverStation.reportError(
+					"Trajectory Duration not supported - use configMotionProfileTrajectoryPeriod instead", false);
+		}
+		return dur;
+	}
+
+	/**
 	 * @return the {@link com.ctre.CANTalon.MotionProfileStatus
 	 *         CANTalon.MotionProfileStatus} object of {@link #talon}
 	 */
-	public CANTalon.MotionProfileStatus getStatus() {
+	public MotionProfileStatus getStatus() {
 		return status;
 	}
 
 	/**
 	 * @return the {@link TalonState} representing {@link #talon}'s current state
 	 */
-	public TalonState getMode() {
+	public SetValueMotionProfile getMode() {
 		return this.currentMode;
 	}
 
@@ -242,49 +277,6 @@ public class ProfileHandler implements Cloneable {
 		}
 	}
 
-}
-
-/**
- * Represents Talon SRX motion profile execution modes.
- * 
- * @author Alec Minchington
- *
- */
-enum TalonState {
-
-	/**
-	 * The possible states of the Talon while in motion profile execution mode.
-	 * <p>
-	 * {@link #NEUTRAL}: Talon is idle
-	 * <p>
-	 * {@link #EXECUTE}: Talon executes the motion profile contained in its buffer
-	 * <p>
-	 * {@link #HOLD}: Talon holds the current motion profile point
-	 */
-	NEUTRAL(0), EXECUTE(1), HOLD(2);
-
-	/**
-	 * The integer value of each state, passed to
-	 * {@link com.ctre.CANTalon#set(double)} to change the Talon's mode.
-	 */
-	private int value;
-
-	/**
-	 * Construct a new {@link TalonState} with its given integer value.
-	 * 
-	 * @param value
-	 *            the integer value of the {@link TalonState}
-	 */
-	private TalonState(int value) {
-		this.value = value;
-	}
-
-	/**
-	 * @return The integer value of this {@link TalonState}
-	 */
-	public int getValue() {
-		return this.value;
-	}
 }
 
 /**

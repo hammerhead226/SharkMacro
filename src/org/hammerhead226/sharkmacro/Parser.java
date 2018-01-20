@@ -81,19 +81,9 @@ public abstract class Parser {
 	 *         able to be written.
 	 */
 	protected boolean writeToFile(ArrayList<String[]> data) {
-		Path p = Paths.get(directory);
-		if (Files.notExists(p)) {
-			try {
-				Files.createDirectories(p);
-				System.out.println("Created Directory: " + directory);
-			} catch (IOException e) {
-				e.printStackTrace();
-				return false;
-			}
-		}
-
+		touchDirectory(directory);
+		
 		CSVWriter writer;
-
 		try {
 			writer = new CSVWriter(new FileWriter(filename), Constants.SEPARATOR, Constants.QUOTECHAR,
 					Constants.ESCAPECHAR, Constants.NEWLINE);
@@ -118,7 +108,7 @@ public abstract class Parser {
 		if (cache.containsKey(filename)) {
 			return cache.get(filename);
 		}
-		
+
 		CSVReader reader;
 		List<String[]> rawFile = new ArrayList<String[]>(0);
 		try {
@@ -130,7 +120,7 @@ public abstract class Parser {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		cache.put(filename, rawFile);
 
 		return rawFile;
@@ -144,6 +134,7 @@ public abstract class Parser {
 	 * @return a new complete filename in the prefix + number naming convention
 	 */
 	protected static String getNewFilename(String directory, String prefix) {
+		touchDirectory(directory);
 		return prefix + String.format("%04d", findLatestNumberedFile(directory, prefix) + 1) + ".csv";
 	}
 
@@ -155,6 +146,7 @@ public abstract class Parser {
 	 *         storage directory
 	 */
 	protected static String getNewestFilename(String directory, String prefix) {
+		touchDirectory(directory);
 		return prefix + String.format("%04d", findLatestNumberedFile(directory, prefix));
 	}
 
@@ -222,6 +214,26 @@ public abstract class Parser {
 			nums[i] = Integer.parseInt(filenames.get(i), 10);
 		}
 		return nums;
+	}
+
+	/**
+	 * Checks if read/write directory exists on disk and creates it if it doesn't.
+	 * 
+	 * @return {@code true} if the directory already exists or was successfully
+	 *         created, {@code false} if an exception was thrown
+	 */
+	private static boolean touchDirectory(String directory) {
+		Path p = Paths.get(directory);
+		if (Files.notExists(p)) {
+			try {
+				Files.createDirectories(p);
+				System.out.println("Created Directory: " + directory);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

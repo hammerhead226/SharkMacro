@@ -1,13 +1,12 @@
 package org.hammerhead226.sharkmacro.motionprofiles;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.hammerhead226.sharkmacro.Constants;
 import org.hammerhead226.sharkmacro.Parser;
 
-import com.ctre.CANTalon;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 /**
  * Handles the reading and writing of {@link Profile}s.
@@ -63,7 +62,7 @@ public final class ProfileParser extends Parser {
 	 * 
 	 * @return a new {@code Profile} instance
 	 */
-	public Profile toObject(CANTalon leftTalon, CANTalon rightTalon) {
+	public Profile toObject(TalonSRX leftTalon, TalonSRX rightTalon) {
 		List<String[]> profileRaw = readFromFile();
 
 		// Process read values into Profile
