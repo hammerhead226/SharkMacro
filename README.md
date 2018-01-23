@@ -7,18 +7,19 @@
 * In order to play back recorded motion profiles, the Talons' PID must be tuned for your drivetrain.
 
 * Configure left and right talon settings
-    * SharkMacro uses 10ms trajectory points by default so no extra trajectory time must be added
-    ```java
-    talon.configMotionProfileTrajectoryPeriod(0, 0);
-    ```
-    * Correct feedback sensor must be set
-    ```java
-    talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-    ```
-    * Sensor values will not be updated fast enough for the recorder unless the feedback status frame is set manually
-    ```java
-    talon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5, 0);
-    ```
+
+  * SharkMacro uses 10ms trajectory points by default so no extra trajectory time must be added
+        ```java
+        talon.configMotionProfileTrajectoryPeriod(0, 0);
+        ```
+  * Correct feedback sensor must be set
+        ```java
+        talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
+        ```
+  * Sensor values will not be updated fast enough for the recorder unless the feedback status frame is set manually
+        ```java
+        talon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5, 0);
+        ```
 ---
 
 * Record a profile
@@ -94,14 +95,17 @@ public class ExampleCommand extends RecordableCommand {
     al.execute();
     ```
 
-# Other
+## Other
 
-## Save directories
+### Save directories
+
 SharkMacro saves profiles directly to the roboRIO internal storage
-* Motion profiles: `\home\lvuser\profiles`
-* Action lists: `\home\lvuser\actionlists`
 
-You can access the saved files via the roboRIO web dashboard's file system browser, but it is recommended that you use an external FTP client such as [WinSCP](https://winscp.net/eng/download.php).
+* Motion profiles: `/home/lvuser/profiles`
+
+* Action lists: `/home/lvuser/actionlists`
+
+You can access the saved files via the roboRIO web dashboard's file system browser, but it is recommended that you use an external SFTP client such as [WinSCP](https://winscp.net/eng/download.php).
 
 ## File naming convention
 The default naming convention for files saved by SharkMacro is:
@@ -109,7 +113,9 @@ The default naming convention for files saved by SharkMacro is:
 prefix####.csv
 ```
 Where prefix is the specific keyword for each type of recorded file.
+
 * Motion profiles: `profile`
+
 * Action lists: `actionlist`
 
 And `####` is the number of the saved file, starting with `0001`.
@@ -133,7 +139,9 @@ There are a couple different methods that can be used to access/generate SharkMa
     ```
     would return `profile0004`.
 ---
+
 * `ProfileParser.getNewestFilename()` & `ActionListParser.getNewestFilename()` - Get the filename of the current newest (highest numbered) file in the save directory. For example, calling `ProfileParser.getNewestFilename()` with the motion profile save directory containing
+
 ```
     profile0001.csv
     profile0002.csv
