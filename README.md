@@ -39,6 +39,45 @@
     Profile p = parser.toObject(leftTalon, rightTalon);
     p.execute(leftPIDSlot, rightPIDSlot);
     ```
+Teams can use a Command to toggle recording:
+
+```java
+public class ToggleProfileRecording extends InstantCommand {
+
+    public ToggleProfileRecording() {
+        super();
+        requires(Robot.driveTrain);
+    }
+
+    protected void initialize() {
+    	Robot.driveTrain.toggleRecording();
+    }
+
+}
+```
+
+In this example the logic for toggling the motion profile recording is contained in the DriveTrain subsystem.
+
+```java
+public class DriveTrain extends Subsystem {
+
+    private TalonSRX leftTalon = new TalonSRX(RobotMap.DT_FL_MOTOR);
+    private TalonSRX rightTalon = new TalonSRX(RobotMap.DT_FR_MOTOR);
+
+    private ProfileRecorder r = new ProfileRecorder(leftTalon, rightTalon);
+
+    public void toggleRecording() {
+        if (r.isRecording()) {
+            ProfileParser p = new ProfileParser(ProfileParser.getNewFilename());
+            p.writeToFile(r.stop().toProfile());
+        } else {
+            // Zero both encoders before recording
+            leftTalon.setSelectedSensorPosition(0, 0, 0);
+            rightTalon.setSelectedSensorPosition(0, 0, 0);
+            r.start();
+    }
+}
+```
 
 ## Action lists
 
@@ -94,6 +133,39 @@ public class ExampleCommand extends RecordableCommand {
     ActionList al = parser.toObject(leftTalon, rightTalon);
     al.execute();
     ```
+Teams can use a Command to toggle recording:
+
+```java
+public class ToggleActionRecording extends InstantCommand {
+
+    public ToggleActionRecording() {
+        super();
+    }
+
+    protected void initialize() {
+        Robot.driveTrain.toggleActionRecording();
+    }
+
+}
+```
+
+In this example the logic for toggling the action recording is contained in the DriveTrain subsystem.
+
+```java
+public class DriveTrain extends Subsystem {
+
+    boolean recording = false;
+    public void toggleActionRecording() {
+        if (recording) {
+            ActionListParser al = new ActionListParser(ActionListParser.getNewFilename());
+            al.writeToFile(ActionRecorder.stop());
+            recording = false;
+        } else {
+            recording = true;
+            ActionRecorder.start();
+        }
+    }
+}
 
 ## Other
 
