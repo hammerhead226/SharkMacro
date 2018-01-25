@@ -205,19 +205,18 @@ profile0003.csv
 There are a couple different methods that can be used to access/generate SharkMacro-named files.
 
 * `ProfileParser.getNewFilename()` & `ActionListParser.getNewFilename()` - Generates a new filename in the SharkMacro convention by looking through the directory for already-existing files and returning a filename with a number equal to the current greatest number plus one. For example, calling `ProfileParser.getNewFilename()` with the motion profile save directory containing
-    ```
-    profile0001.csv
-    profile0002.csv
-    profile0003.csv
-    ```
+
+  * `profile0001.csv`
+  * `profile0002.csv`
+  * `profile0003.csv`
+
     would return `profile0004`.
 ---
 
 * `ProfileParser.getNewestFilename()` & `ActionListParser.getNewestFilename()` - Get the filename of the current newest (highest numbered) file in the save directory. For example, calling `ProfileParser.getNewestFilename()` with the motion profile save directory containing
 
-```
-    profile0001.csv
-    profile0002.csv
-    profile0003.csv
-```
+  * `profile0001.csv`
+  * `profile0002.csv`
+  * `profile0003.csv`
+
 would return `profile0003`.
