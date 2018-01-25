@@ -194,11 +194,10 @@ Where prefix is the specific keyword for each type of recorded file.
 And `####` is the number of the saved file, starting with `0001`.
 
 So, three motion profiles saved with the SharkMacro naming convention would look like:
-```
-profile0001.csv
-profile0002.csv
-profile0003.csv
-```
+
+* `profile0001.csv`
+* `profile0002.csv`
+* `profile0003.csv`
 
 ### Using the SharkMacro naming convention
 
