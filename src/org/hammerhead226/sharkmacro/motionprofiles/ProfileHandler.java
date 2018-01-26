@@ -132,8 +132,6 @@ public class ProfileHandler implements Cloneable {
 	public void manage() {
 		fillTalonWithMotionProfile(gainsProfile);
 		talon.getMotionProfileStatus(status);
-		System.out.println(talon.getDeviceID() + ": " + status.btmBufferCnt + ", " + status.topBufferCnt + " - "
-				+ status.isUnderrun);
 
 		switch (executionState) {
 		case WAITING:
