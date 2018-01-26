@@ -26,6 +26,11 @@ public class ProfileHandler implements Cloneable {
 	 * The motion profile to execute.
 	 */
 	private double[][] profile;
+	
+	/**
+	 * Represents the current point being streamed from the profile.
+	 */
+	int profileIndex = 0;
 
 	/**
 	 * The PID gains profile {@link #talon} will use to execute the motion profile.s
@@ -166,14 +171,13 @@ public class ProfileHandler implements Cloneable {
 		talon.set(ControlMode.MotionProfile, mode.value);
 	}
 
+	
 	/**
 	 * Fill the Talon's top-level buffer with a given motion profile.
 	 * 
 	 * @param gainsProfile
 	 *            the PID gains profile to use to execute the motion profile
 	 */
-	int profileIndex = 0;
-
 	private void fillTalonWithMotionProfile(int gainsProfile) {
 
 		TrajectoryPoint point = new TrajectoryPoint();
