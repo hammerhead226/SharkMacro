@@ -62,7 +62,7 @@ public class ActionRecorder {
 			return new ActionList(buffer);
 		} else {
 			DriverStation.getInstance();
-			DriverStation.reportError("Tried to stop recording but not started!", false);
+			DriverStation.reportWarning("Tried to stop recording but not started!", false);
 			return new ActionList(new ArrayList<Action>());
 		}
 	}
@@ -79,7 +79,7 @@ public class ActionRecorder {
 			buffer.add(a);
 		} else {
 			DriverStation.getInstance();
-			DriverStation.reportError("Tried to add action while not recording! Call start() first.", false);
+			DriverStation.reportWarning("Tried to add action while not recording! Call start() first.", false);
 		}
 	}
 
