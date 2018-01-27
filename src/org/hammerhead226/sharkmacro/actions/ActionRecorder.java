@@ -20,7 +20,7 @@ public class ActionRecorder {
 	 * Represents whether this {@link ActionRecorder} has started recording
 	 * {@link Actions}.
 	 */
-	private static boolean started = false;
+	private static boolean isRecording = false;
 
 	/**
 	 * {@link edu.wpi.first.wpilibj.Timer Timer} used to record the start and end
@@ -39,10 +39,10 @@ public class ActionRecorder {
 	 * starts the {@link #timer}.
 	 */
 	public static void start() {
-		if (!started) {
+		if (!isRecording) {
 			buffer.clear();
 			timer.start();
-			started = true;
+			isRecording = true;
 		}
 	}
 
@@ -54,10 +54,10 @@ public class ActionRecorder {
 	 * @return a new {@link ActionList} of the recorded {@link Action}s
 	 */
 	public static ActionList stop() {
-		if (started) {
+		if (isRecording) {
 			timer.stop();
 			timer.reset();
-			started = false;
+			isRecording = false;
 			return new ActionList(buffer);
 		} else {
 			System.out.println("Tried to stop recording but not started!");
@@ -73,7 +73,7 @@ public class ActionRecorder {
 	 *            the {@code Action} to be added
 	 */
 	public static void addAction(Action a) {
-		if (started) {
+		if (isRecording) {
 			buffer.add(a);
 		} else {
 			System.out.println("Tried to add action while not recording! Call start() first.");
@@ -88,6 +88,13 @@ public class ActionRecorder {
 	 */
 	public static double getTime() {
 		return timer.get();
+	}
+	
+	/**
+	 * @return {@code true} if the {@code ActionRecorder} is currently recording, {@code false} if not
+	 */
+	public boolean isRecording() {
+		return isRecording;
 	}
 
 }

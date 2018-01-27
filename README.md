@@ -154,14 +154,11 @@ In this example the logic for toggling the action recording is contained in the 
 ```java
 public class DriveTrain extends Subsystem {
 
-    boolean recording = false;
     public void toggleActionRecording() {
-        if (recording) {
+        if (ActionRecorder.isRecording()) {
             ActionListParser al = new ActionListParser(ActionListParser.getNewFilename());
             al.writeToFile(ActionRecorder.stop());
-            recording = false;
         } else {
-            recording = true;
             ActionRecorder.start();
         }
     }
