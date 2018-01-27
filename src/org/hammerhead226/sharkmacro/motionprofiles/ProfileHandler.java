@@ -11,7 +11,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Class to easily manage motion profile execution on a Talon SRX. Some logic
@@ -27,11 +26,11 @@ public class ProfileHandler implements Cloneable {
 	 * The motion profile to execute.
 	 */
 	private double[][] profile;
-
+	
 	/**
-	 * The length of {@link #profile}.
+	 * Represents the current point being streamed from the profile.
 	 */
-	private int profileSize;
+	int profileIndex = 0;
 
 	/**
 	 * The PID gains profile {@link #talon} will use to execute the motion profile.s
@@ -92,7 +91,6 @@ public class ProfileHandler implements Cloneable {
 	 */
 	public ProfileHandler(final double[][] profile, TalonSRX talon, int gainsProfile) {
 		this.profile = profile;
-		this.profileSize = profile.length;
 		this.talon = talon;
 		this.gainsProfile = gainsProfile;
 		this.executionState = ExecutionState.WAITING;
@@ -137,6 +135,7 @@ public class ProfileHandler implements Cloneable {
 	 * state of the Talon executing the motion profile.
 	 */
 	public void manage() {
+		fillTalonWithMotionProfile(gainsProfile);
 		talon.getMotionProfileStatus(status);
 
 		switch (executionState) {
@@ -144,7 +143,6 @@ public class ProfileHandler implements Cloneable {
 			if (started) {
 				started = false;
 				setMode(SetValueMotionProfile.Disable);
-				fillTalonWithMotionProfile(gainsProfile);
 				executionState = ExecutionState.STARTED;
 			}
 			break;
@@ -173,6 +171,7 @@ public class ProfileHandler implements Cloneable {
 		talon.set(ControlMode.MotionProfile, mode.value);
 	}
 
+	
 	/**
 	 * Fill the Talon's top-level buffer with a given motion profile.
 	 * 
@@ -183,27 +182,35 @@ public class ProfileHandler implements Cloneable {
 
 		TrajectoryPoint point = new TrajectoryPoint();
 
-		talon.clearMotionProfileTrajectories();
-		talon.configMotionProfileTrajectoryPeriod(TrajectoryDuration.Trajectory_Duration_0ms.value, 0);
+		if (profileIndex == 0) {
+			talon.clearMotionProfileTrajectories();
+			talon.configMotionProfileTrajectoryPeriod(TrajectoryDuration.Trajectory_Duration_0ms.value, 0);
+			talon.clearMotionProfileHasUnderrun(0);
+		}
 
-		for (int i = 0; i < profileSize; ++i) {
-			point.position = profile[i][0];
-			point.velocity = profile[i][1];
+		while (status.topBufferCnt < Constants.TALON_TOP_BUFFER_MAX_COUNT && profileIndex < profile.length) {
+
+			point.position = profile[profileIndex][0];
+			point.velocity = profile[profileIndex][1];
 			point.headingDeg = 0;
-			point.timeDur = toTrajectoryDuration((int) profile[i][2]);
+			point.timeDur = toTrajectoryDuration((int) profile[profileIndex][2]);
 			point.profileSlotSelect0 = gainsProfile;
 			point.profileSlotSelect1 = 0;
 			point.zeroPos = false;
-			if (i == 0) {
+			if (profileIndex == 0) {
 				point.zeroPos = true;
 			}
 
 			point.isLastPoint = false;
-			if ((i + 1) == profileSize) {
+			if ((profileIndex + 1) == profile.length) {
 				point.isLastPoint = true;
 			}
 
 			talon.pushMotionProfileTrajectory(point);
+
+			talon.getMotionProfileStatus(status);
+
+			profileIndex++;
 		}
 	}
 
