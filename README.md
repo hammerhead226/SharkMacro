@@ -39,6 +39,7 @@
     Profile p = parser.toObject(leftTalon, rightTalon);
     p.execute(leftPIDSlot, rightPIDSlot);
     ```
+Teams can use a Command to toggle recording:
 
 ```java
 public class ToggleProfileRecording extends InstantCommand {
@@ -55,6 +56,7 @@ public class ToggleProfileRecording extends InstantCommand {
 }
 ```
 
+In this example the logic for toggling the motion profile recording is contained in the DriveTrain subsystem.
 
 ```java
 public class DriveTrain extends Subsystem {
@@ -69,6 +71,7 @@ public class DriveTrain extends Subsystem {
             ProfileParser p = new ProfileParser(ProfileParser.getNewFilename());
             p.writeToFile(r.stop().toProfile());
         } else {
+            // Zero both encoders before recording
             leftTalon.setSelectedSensorPosition(0, 0, 0);
             rightTalon.setSelectedSensorPosition(0, 0, 0);
             r.start();
@@ -78,6 +81,7 @@ public class DriveTrain extends Subsystem {
 
 ## Action lists
 
+SharkMacro's action recording framework piggybacks off of the WPILib Command system, meaning teams won't have to learn a new format for robot commands.
 
 All robot commands that are going to be recorded should extend `SharkMacro.RecordableCommand` instead of `Command` and should call `super.initialize()` in `initialize()`, `super.end()` in `end()`, and `super.interrupted()` in `interrupted()`.
 
@@ -129,6 +133,7 @@ public class ExampleCommand extends RecordableCommand {
     ActionList al = parser.toObject(leftTalon, rightTalon);
     al.execute();
     ```
+Teams can use a Command to toggle recording:
 
 ```java
 public class ToggleActionRecording extends InstantCommand {
@@ -144,6 +149,7 @@ public class ToggleActionRecording extends InstantCommand {
 }
 ```
 
+In this example the logic for toggling the action recording is contained in the DriveTrain subsystem.
 
 ```java
 public class DriveTrain extends Subsystem {
