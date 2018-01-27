@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.hammerhead226.sharkmacro.Constants;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -60,7 +61,8 @@ public class ActionRecorder {
 			isRecording = false;
 			return new ActionList(buffer);
 		} else {
-			System.out.println("Tried to stop recording but not started!");
+			DriverStation.getInstance();
+			DriverStation.reportWarning("Tried to stop recording but not started!", false);
 			return new ActionList(new ArrayList<Action>());
 		}
 	}
@@ -76,7 +78,8 @@ public class ActionRecorder {
 		if (isRecording) {
 			buffer.add(a);
 		} else {
-			System.out.println("Tried to add action while not recording! Call start() first.");
+			DriverStation.getInstance();
+			DriverStation.reportWarning("Tried to add action while not recording! Call start() first.", false);
 		}
 	}
 
