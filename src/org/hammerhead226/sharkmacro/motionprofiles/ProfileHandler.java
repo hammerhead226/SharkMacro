@@ -20,27 +20,49 @@ import edu.wpi.first.wpilibj.Notifier;
  * @author Alec Minchington
  *
  */
-public class ProfileHandler implements Cloneable {
+public class ProfileHandler {
 
 	/**
-	 * The motion profile to execute.
+	 * The motion profile to execute on {@link #leftTalon}.
 	 */
-	private double[][] profile;
-	
-	/**
-	 * Represents the current point being streamed from the profile.
-	 */
-	int profileIndex = 0;
+	private double[][] leftProfile;
 
 	/**
-	 * The PID gains profile {@link #talon} will use to execute the motion profile.s
+	 * The motion profile to execute on {@link #rightTalon}.
 	 */
-	private int gainsProfile;
+	private double[][] rightProfile;
 
 	/**
-	 * The Talon used to execute the motion profile.
+	 * Represents the current point being streamed from the left profile to the left talon.
 	 */
-	private TalonSRX talon;
+	int leftProfileIndex = 0;
+
+	/**
+	 * Represents the current point being streamed from the right profile to the right talon.
+	 */
+	int rightProfileIndex = 0;
+
+	/**
+	 * The PID gains profile {@link #leftTalon} will use to execute the motion
+	 * profile
+	 */
+	private int leftGainsProfile;
+
+	/**
+	 * The PID gains profile {@link #rightTalon} will use to execute the motion
+	 * profile
+	 */
+	private int rightGainsProfile;
+
+	/**
+	 * The talon used to execute the left motion profile.
+	 */
+	private TalonSRX leftTalon;
+
+	/**
+	 * The talon used to execute the right motion profile.
+	 */
+	private TalonSRX rightTalon;
 
 	/**
 	 * Object that takes a runnable class and starts a new thread to call its
@@ -57,9 +79,9 @@ public class ProfileHandler implements Cloneable {
 	private ExecutionState executionState;
 
 	/**
-	 * The current state of {@link #talon}.
+	 * The current state of the talons.
 	 * 
-	 * @see TalonState
+	 * @see SetValueMotionProfile
 	 */
 	private SetValueMotionProfile currentMode;
 
@@ -74,30 +96,46 @@ public class ProfileHandler implements Cloneable {
 	private boolean started = false;
 
 	/**
-	 * The status of {@link #talon}.
+	 * The status of {@link #leftTalon}.
 	 */
-	private MotionProfileStatus status = new MotionProfileStatus();
+	private MotionProfileStatus leftStatus = new MotionProfileStatus();
+
+	/**
+	 * The status of {@link #rightTalon}.
+	 */
+	private MotionProfileStatus rightStatus = new MotionProfileStatus();
 
 	/**
 	 * Constructs a new {@link MotionProfileHandler} object that will handle the
-	 * execution of {@link #profile} on {@link #talon}.
+	 * execution of the given motion profiles on their respective talons.
 	 * 
-	 * @param profile
-	 *            the motion profile to be executed
-	 * @param talon
-	 *            the Talon to execute the profile on
-	 * @param gainsProfile
-	 *            the PID gains profile to use
+	 * @param leftProfile
+	 *            the motion profile to be executed on the left talon
+	 * @param rightProfile
+	 *            the motion profile to be executed on the right talon
+	 * @param leftTalon
+	 *            the talon to execute the left profile on
+	 * @param rightTalon
+	 *            the talon to execute the right profile on
+	 * @param leftGainsProfile
+	 *            the PID gains profile to use on the left talon
+	 * @param rightGainsProfile
+	 *            the PID gains profile to use on the right talon
 	 */
-	public ProfileHandler(final double[][] profile, TalonSRX talon, int gainsProfile) {
-		this.profile = profile;
-		this.talon = talon;
-		this.gainsProfile = gainsProfile;
+	public ProfileHandler(final double[][] leftProfile, final double[][] rightProfile, TalonSRX leftTalon,
+			TalonSRX rightTalon, int leftGainsProfile, int rightGainsProfile) {
+		this.leftProfile = leftProfile;
+		this.rightProfile = rightProfile;
+		this.leftTalon = leftTalon;
+		this.rightTalon = rightTalon;
+		this.leftGainsProfile = leftGainsProfile;
+		this.rightGainsProfile = rightGainsProfile;
 		this.executionState = ExecutionState.WAITING;
 
 		bufferThread = new Notifier(new PeriodicBufferProcessor());
 		bufferThread.startPeriodic(Constants.DT_SECONDS / 2.0);
-		this.talon.changeMotionControlFramePeriod((int) Math.round((Constants.DT_MS / 2.0)));
+		this.leftTalon.changeMotionControlFramePeriod((int) Math.round((Constants.DT_MS / 2.0)));
+		this.rightTalon.changeMotionControlFramePeriod((int) Math.round((Constants.DT_MS / 2.0)));
 
 		executorThread = new Notifier(new PeriodicExecutor());
 	}
@@ -127,7 +165,8 @@ public class ProfileHandler implements Cloneable {
 		bufferThread.stop();
 		executorThread.stop();
 		setMode(SetValueMotionProfile.Disable);
-		talon.clearMotionProfileTrajectories();
+		leftTalon.clearMotionProfileTrajectories();
+		rightTalon.clearMotionProfileTrajectories();
 	}
 
 	/**
@@ -135,8 +174,9 @@ public class ProfileHandler implements Cloneable {
 	 * state of the Talon executing the motion profile.
 	 */
 	public void manage() {
-		fillTalonWithMotionProfile(gainsProfile);
-		talon.getMotionProfileStatus(status);
+		fillTalonsWithMotionProfile();
+		leftTalon.getMotionProfileStatus(leftStatus);
+		rightTalon.getMotionProfileStatus(rightStatus);
 
 		switch (executionState) {
 		case WAITING:
@@ -147,13 +187,15 @@ public class ProfileHandler implements Cloneable {
 			}
 			break;
 		case STARTED:
-			if (status.btmBufferCnt > Constants.MINIMUM_POINTS_IN_TALON) {
+			if (leftStatus.btmBufferCnt > Constants.MINIMUM_POINTS_IN_TALON
+					&& rightStatus.btmBufferCnt > Constants.MINIMUM_POINTS_IN_TALON) {
 				setMode(SetValueMotionProfile.Enable);
 				executionState = ExecutionState.EXECUTING;
 			}
 			break;
 		case EXECUTING:
-			if (status.activePointValid && status.isLast) {
+			if ((leftStatus.activePointValid && leftStatus.isLast)
+					&& (rightStatus.activePointValid && rightStatus.isLast)) {
 				onFinish();
 			}
 			break;
@@ -161,57 +203,141 @@ public class ProfileHandler implements Cloneable {
 	}
 
 	/**
-	 * Sets the state of {@link #talon}.
+	 * Sets the state of the talons.
 	 * 
 	 * @param t
 	 *            the motion profile mode to set the Talon to
 	 */
 	private void setMode(SetValueMotionProfile mode) {
 		this.currentMode = mode;
-		talon.set(ControlMode.MotionProfile, mode.value);
+		leftTalon.set(ControlMode.MotionProfile, mode.value);
+		rightTalon.set(ControlMode.MotionProfile, mode.value);
 	}
 
-	
 	/**
 	 * Fill the Talon's top-level buffer with a given motion profile.
 	 * 
 	 * @param gainsProfile
 	 *            the PID gains profile to use to execute the motion profile
 	 */
-	private void fillTalonWithMotionProfile(int gainsProfile) {
+	private void fillTalonsWithMotionProfile() {
 
+		// maybe need two point objects?
 		TrajectoryPoint point = new TrajectoryPoint();
 
-		if (profileIndex == 0) {
-			talon.clearMotionProfileTrajectories();
-			talon.configMotionProfileTrajectoryPeriod(TrajectoryDuration.Trajectory_Duration_0ms.value, 0);
-			talon.clearMotionProfileHasUnderrun(0);
+		if (leftProfileIndex == 0) {
+			leftTalon.clearMotionProfileTrajectories();
+			leftTalon.configMotionProfileTrajectoryPeriod(TrajectoryDuration.Trajectory_Duration_0ms.value, 0);
+			leftTalon.clearMotionProfileHasUnderrun(0);
 		}
 
-		while (status.topBufferCnt < Constants.TALON_TOP_BUFFER_MAX_COUNT && profileIndex < profile.length) {
+		if (rightProfileIndex == 0) {
+			rightTalon.clearMotionProfileTrajectories();
+			rightTalon.configMotionProfileTrajectoryPeriod(TrajectoryDuration.Trajectory_Duration_0ms.value, 0);
+			rightTalon.clearMotionProfileHasUnderrun(0);
+		}
 
-			point.position = profile[profileIndex][0];
-			point.velocity = profile[profileIndex][1];
+		while (leftStatus.topBufferCnt < Constants.TALON_TOP_BUFFER_MAX_COUNT
+				&& leftProfileIndex < leftProfile.length) {
+
+			point.position = leftProfile[leftProfileIndex][0];
+			point.velocity = leftProfile[leftProfileIndex][1];
 			point.headingDeg = 0;
-			point.timeDur = toTrajectoryDuration((int) profile[profileIndex][2]);
-			point.profileSlotSelect0 = gainsProfile;
+			point.timeDur = toTrajectoryDuration((int) leftProfile[leftProfileIndex][2]);
+			point.profileSlotSelect0 = leftGainsProfile;
 			point.profileSlotSelect1 = 0;
 			point.zeroPos = false;
-			if (profileIndex == 0) {
+			if (leftProfileIndex == 0) {
 				point.zeroPos = true;
 			}
 
 			point.isLastPoint = false;
-			if ((profileIndex + 1) == profile.length) {
+			if ((leftProfileIndex + 1) == leftProfile.length) {
 				point.isLastPoint = true;
 			}
 
-			talon.pushMotionProfileTrajectory(point);
+			leftTalon.pushMotionProfileTrajectory(point);
 
-			talon.getMotionProfileStatus(status);
+			leftTalon.getMotionProfileStatus(leftStatus);
 
-			profileIndex++;
+			leftProfileIndex++;
 		}
+
+		while (rightStatus.topBufferCnt < Constants.TALON_TOP_BUFFER_MAX_COUNT
+				&& rightProfileIndex < rightProfile.length) {
+
+			point.position = rightProfile[rightProfileIndex][0];
+			point.velocity = rightProfile[rightProfileIndex][1];
+			point.headingDeg = 0;
+			point.timeDur = toTrajectoryDuration((int) rightProfile[rightProfileIndex][2]);
+			point.profileSlotSelect0 = rightGainsProfile;
+			point.profileSlotSelect1 = 0;
+			point.zeroPos = false;
+			if (rightProfileIndex == 0) {
+				point.zeroPos = true;
+			}
+
+			point.isLastPoint = false;
+			if ((rightProfileIndex + 1) == rightProfile.length) {
+				point.isLastPoint = true;
+			}
+
+			rightTalon.pushMotionProfileTrajectory(point);
+
+			rightTalon.getMotionProfileStatus(rightStatus);
+
+			rightProfileIndex++;
+		}
+		
+//		while ((leftStatus.topBufferCnt < Constants.TALON_TOP_BUFFER_MAX_COUNT && leftProfileIndex < leftProfile.length)
+//				|| (rightStatus.topBufferCnt < Constants.TALON_TOP_BUFFER_MAX_COUNT
+//						&& rightProfileIndex < rightProfile.length)) {
+//
+//			leftPoint.position = leftProfile[leftProfileIndex][0];
+//			rightPoint.position = rightProfile[rightProfileIndex][0];
+//
+//			leftPoint.velocity = leftProfile[leftProfileIndex][1];
+//			rightPoint.velocity = rightProfile[rightProfileIndex][1];
+//
+//			leftPoint.headingDeg = 0;
+//			rightPoint.headingDeg = 0;
+//
+//			leftPoint.timeDur = toTrajectoryDuration((int) leftProfile[leftProfileIndex][2]);
+//			rightPoint.timeDur = toTrajectoryDuration((int) rightProfile[rightProfileIndex][2]);
+//
+//			leftPoint.profileSlotSelect0 = leftGainsProfile;
+//			rightPoint.profileSlotSelect0 = rightGainsProfile;
+//
+//			leftPoint.profileSlotSelect1 = 0;
+//			rightPoint.profileSlotSelect1 = 0;
+//
+//			leftPoint.zeroPos = false;
+//			if (leftProfileIndex == 0) {
+//				leftPoint.zeroPos = true;
+//			}
+//			rightPoint.zeroPos = false;
+//			if (rightProfileIndex == 0) {
+//				rightPoint.zeroPos = true;
+//			}
+//
+//			leftPoint.isLastPoint = false;
+//			if ((leftProfileIndex + 1) == leftProfile.length) {
+//				leftPoint.isLastPoint = true;
+//			}
+//			rightPoint.isLastPoint = false;
+//			if ((rightProfileIndex + 1) == rightProfile.length) {
+//				rightPoint.isLastPoint = true;
+//			}
+//
+//			leftTalon.pushMotionProfileTrajectory(leftPoint);
+//			rightTalon.pushMotionProfileTrajectory(rightPoint);
+//
+//			leftTalon.getMotionProfileStatus(leftStatus);
+//			rightTalon.getMotionProfileStatus(rightStatus);
+//
+//			leftProfileIndex++;
+//			rightProfileIndex++;
+//		}
 	}
 
 	/**
@@ -236,14 +362,14 @@ public class ProfileHandler implements Cloneable {
 
 	/**
 	 * @return the {@link com.ctre.CANTalon.MotionProfileStatus
-	 *         CANTalon.MotionProfileStatus} object of {@link #talon}
+	 *         CANTalon.MotionProfileStatus} objects of each of the talons.
 	 */
-	public MotionProfileStatus getStatus() {
-		return status;
+	public MotionProfileStatus[] getStatus() {
+		return new MotionProfileStatus[] { leftStatus, rightStatus };
 	}
 
 	/**
-	 * @return the {@link TalonState} representing {@link #talon}'s current state
+	 * @return the {@link TalonState} representing the talons' current state
 	 */
 	public SetValueMotionProfile getMode() {
 		return this.currentMode;
@@ -260,11 +386,13 @@ public class ProfileHandler implements Cloneable {
 	/**
 	 * Class to periodically call
 	 * {@link com.ctre.CANTalon#processMotionProfileBuffer()
-	 * processMotionProfileBufffer()} for {@link ProfileHandler#talon}.
+	 * processMotionProfileBufffer()} for {@link ProfileHandler#leftTalon} and
+	 * {@link ProfileHandler#rightTalon}.
 	 */
 	class PeriodicBufferProcessor implements java.lang.Runnable {
 		public void run() {
-			talon.processMotionProfileBuffer();
+			leftTalon.processMotionProfileBuffer();
+			rightTalon.processMotionProfileBuffer();
 		}
 	}
 

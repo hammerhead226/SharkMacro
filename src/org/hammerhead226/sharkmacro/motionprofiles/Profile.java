@@ -28,14 +28,9 @@ public class Profile {
 	public final int dt;
 
 	/**
-	 * The {@link ProfileHandler} that will handle {@link #leftProfile}.
+	 * The {@link ProfileHandler} that will handle the motion profiles.
 	 */
-	private ProfileHandler left;
-
-	/**
-	 * The {@link ProfileHandler} that will handle {@link #rightProfile}.
-	 */
-	private ProfileHandler right;
+	private ProfileHandler handler;
 
 	/**
 	 * the Talon to execute the left profile with
@@ -112,10 +107,8 @@ public class Profile {
 	 *            the PID gains profile to use to execute the right motion profile
 	 */
 	public void execute(int leftGainsProfile, int rightGainsProfile) {
-		left = new ProfileHandler(leftProfile, leftTalon, leftGainsProfile);
-		right = new ProfileHandler(rightProfile, rightTalon, rightGainsProfile);
-		left.execute();
-		right.execute();
+		handler = new ProfileHandler(leftProfile, rightProfile, leftTalon, rightTalon, leftGainsProfile, rightGainsProfile);
+		handler.execute();
 	}
 
 	/**
@@ -124,15 +117,10 @@ public class Profile {
 	 * profile's execution is interrupted.
 	 */
 	public void onInterrupt() {
-		if (left != null) {
-			left.onInterrupt();
+		if (handler != null) {
+			handler.onInterrupt();
 		} else {
-			DriverStation.getInstance().reportWarning("No left instance of ProfileHandler to interrupt!", false);
-		}
-		if (right != null) {
-			right.onInterrupt();
-		} else {
-			DriverStation.getInstance().reportWarning("No right instance of ProfileHandler to interrupt!", false);
+			DriverStation.getInstance().reportWarning("No instance of ProfileHandler to interrupt!", false);
 		}
 	}
 
@@ -143,7 +131,7 @@ public class Profile {
 	 *         executing their respective profiles, {@code false} otherwise
 	 */
 	public boolean isFinished() {
-		return left.isFinished() && right.isFinished();
+		return handler.isFinished();
 	}
 
 	/**
