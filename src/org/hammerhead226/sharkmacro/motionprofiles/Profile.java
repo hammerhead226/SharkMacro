@@ -102,12 +102,13 @@ public class Profile {
 	 * {@link ProfileHandler#execute() execute()} method.
 	 * 
 	 * @param leftGainsProfile
-	 *            the PID gains profile to use to execute the left motion profile
+	 *            the PID slot index to use to execute the left motion profile
 	 * @param rightGainsProfile
-	 *            the PID gains profile to use to execute the right motion profile
+	 *            the PID slot index to use to execute the right motion profile
 	 */
-	public void execute(int leftGainsProfile, int rightGainsProfile) {
-		handler = new ProfileHandler(leftProfile, rightProfile, leftTalon, rightTalon, leftGainsProfile, rightGainsProfile);
+	public void execute(int leftPidSlotIdx, int rightPidSlotIdx) {
+		handler = new ProfileHandler(new double[][][] { leftProfile, rightProfile },
+				new TalonSRX[] { leftTalon, rightTalon }, new int[] { leftPidSlotIdx, rightPidSlotIdx });
 		handler.execute();
 	}
 
