@@ -57,6 +57,8 @@ public class ProfileRecorder {
 	 * {@link java.lang.Runnable#run() run()} method periodically.
 	 */
 	Notifier thread;
+	
+	Object listLock = new Object();
 
 	/**
 	 * Construct a new {@link ProfileRecorder} object.
@@ -90,14 +92,16 @@ public class ProfileRecorder {
 		// Stop recording encoder readings
 		thread.stop();
 
-		lists = new ArrayList<ArrayList<Integer>>() {
-			{
-				add(leftPosition);
-				add(leftVelocity);
-				add(rightPosition);
-				add(rightVelocity);
-			}
-		};
+		synchronized (listLock) {
+			lists = new ArrayList<ArrayList<Integer>>() {
+				{
+					add(leftPosition);
+					add(leftVelocity);
+					add(rightPosition);
+					add(rightVelocity);
+				}
+			};
+		}
 		isRecording = false;
 		return new Recording(lists, talons[0], talons[1]);
 	}
@@ -132,11 +136,13 @@ public class ProfileRecorder {
 		 * Add position and velocity readings from the Talons to their respective list.
 		 */
 		public void run() {
-			leftPosition.add(talons[0].getSelectedSensorPosition(0));
-			leftVelocity.add(talons[0].getSelectedSensorVelocity(0));
+			synchronized (listLock) {
+				leftPosition.add(talons[0].getSelectedSensorPosition(0));
+				leftVelocity.add(talons[0].getSelectedSensorVelocity(0));
 
-			rightPosition.add(talons[1].getSelectedSensorPosition(0));
-			rightVelocity.add(talons[1].getSelectedSensorVelocity(0));
+				rightPosition.add(talons[1].getSelectedSensorPosition(0));
+				rightVelocity.add(talons[1].getSelectedSensorVelocity(0));
+			}
 		}
 	}
 
