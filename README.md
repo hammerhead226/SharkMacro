@@ -1,5 +1,10 @@
 # SharkMacro
 
+## Dependencies
+
+1. OpenCSV (tested on 4.1)
+2. Apache Commons Lang (tested on 3.7)
+
 ## Motion profiles
 
 ### Before you start
