@@ -77,10 +77,15 @@ public class ProfileHandler {
 	private boolean started = false;
 
 	/**
-	 * List of {@link com.ctre.phoenix.motion.MotionProfileStatus MotionProfileStatus} objects for each Talon.
+	 * List of {@link com.ctre.phoenix.motion.MotionProfileStatus
+	 * MotionProfileStatus} objects for each talon.
 	 */
-	private MotionProfileStatus[] statuses = new MotionProfileStatus[] { new MotionProfileStatus(),
-			new MotionProfileStatus() };
+	private MotionProfileStatus[] statuses;
+
+	/**
+	 * List of trajectory points to be pushed to each talon.
+	 */
+	private TrajectoryPoint[] trajPoints;
 
 	/**
 	 * Constructs a new {@link MotionProfileHandler} object that will handle the
@@ -98,6 +103,14 @@ public class ProfileHandler {
 		this.talons = talons;
 		this.pidSlotIdxs = pidSlotIdxs;
 		this.executionState = ExecutionState.WAITING;
+		this.statuses = new MotionProfileStatus[talons.length];
+		for (int i = 0; i < statuses.length; i++) {
+			statuses[i] = new MotionProfileStatus();
+		}
+		this.trajPoints = new TrajectoryPoint[talons.length];
+		for (int i = 0; i < trajPoints.length; i++) {
+			trajPoints[i] = new TrajectoryPoint();
+		}
 
 		bufferThread = new Notifier(new PeriodicBufferProcessor());
 		bufferThread.startPeriodic(Constants.DT_SECONDS / 2.0);
@@ -147,6 +160,8 @@ public class ProfileHandler {
 		fillTalonsWithMotionProfile();
 		updateMotionProfilesStatuses();
 
+		boolean temp = true;
+
 		switch (executionState) {
 		case WAITING:
 			if (started) {
@@ -156,15 +171,24 @@ public class ProfileHandler {
 			}
 			break;
 		case STARTED:
-			if (statuses[0].btmBufferCnt > Constants.MINIMUM_POINTS_IN_TALON
-					&& statuses[1].btmBufferCnt > Constants.MINIMUM_POINTS_IN_TALON) {
+			for (int i = 0; i < statuses.length; i++) {
+				if (!(statuses[i].btmBufferCnt > Constants.MINIMUM_POINTS_IN_TALON)) {
+					temp = false;
+				}
+			}
+			if (temp) {
 				setMode(SetValueMotionProfile.Enable);
 				executionState = ExecutionState.EXECUTING;
 			}
 			break;
 		case EXECUTING:
-			if ((statuses[0].activePointValid && statuses[0].isLast)
-					&& (statuses[1].activePointValid && statuses[1].isLast)) {
+			temp = true;
+			for (int i = 0; i < statuses.length; i++) {
+				if (!(statuses[i].activePointValid && statuses[i].isLast)) {
+					temp = false;
+				}
+			}
+			if (temp) {
 				onFinish();
 			}
 			break;
@@ -190,8 +214,6 @@ public class ProfileHandler {
 	 */
 	private void fillTalonsWithMotionProfile() {
 
-		TrajectoryPoint[] trajPoints = new TrajectoryPoint[] { new TrajectoryPoint(), new TrajectoryPoint() };
-
 		if (profileIndex == 0) {
 			for (int i = 0; i < talons.length; i++) {
 				talons[i].clearMotionProfileTrajectories();
@@ -202,12 +224,14 @@ public class ProfileHandler {
 
 		updateMotionProfilesStatuses();
 
-		int numPointsToFill;
-		if (statuses[0].topBufferCnt > statuses[1].topBufferCnt) {
-			numPointsToFill = Constants.TALON_TOP_BUFFER_MAX_COUNT - statuses[0].topBufferCnt;
-		} else {
-			numPointsToFill = Constants.TALON_TOP_BUFFER_MAX_COUNT - statuses[1].topBufferCnt;
+		int maxFilled = statuses[0].topBufferCnt;
+		for (int i = 0; i < statuses.length; i++) {
+			if (statuses[i].topBufferCnt > maxFilled) {
+				maxFilled = statuses[i].topBufferCnt;
+			}
 		}
+
+		int numPointsToFill = Constants.TALON_TOP_BUFFER_MAX_COUNT - maxFilled;
 
 		while (profileIndex < profiles[0].length && profileIndex < profiles[1].length && numPointsToFill > 0) {
 			for (int i = 0; i < trajPoints.length; i++) {
