@@ -1,3 +1,4 @@
+
 package org.hammerhead226.sharkmacro.motionprofiles;
 
 import org.hammerhead226.sharkmacro.Constants;
@@ -104,7 +105,7 @@ public class ProfileHandler {
 
 		bufferThread = new Notifier(new PeriodicBufferProcessor());
 		bufferThread.startPeriodic(Constants.DT_SECONDS / 2.0);
-		
+
 		this.talons[0].changeMotionControlFramePeriod(Constants.MOTIONCONTROL_FRAME_PERIOD);
 		this.talons[1].changeMotionControlFramePeriod(Constants.MOTIONCONTROL_FRAME_PERIOD);
 
@@ -204,9 +205,17 @@ public class ProfileHandler {
 			talons[1].clearMotionProfileHasUnderrun(0);
 		}
 
-		while ((leftStatus.topBufferCnt < Constants.TALON_TOP_BUFFER_MAX_COUNT && profileIndex < profiles[0].length)
-				|| (rightStatus.topBufferCnt < Constants.TALON_TOP_BUFFER_MAX_COUNT
-						&& profileIndex < profiles[1].length)) {
+		talons[0].getMotionProfileStatus(leftStatus);
+		talons[1].getMotionProfileStatus(rightStatus);
+
+		int numPointsToFill;
+		if (leftStatus.topBufferCnt > rightStatus.topBufferCnt) {
+			numPointsToFill = Constants.TALON_TOP_BUFFER_MAX_COUNT - leftStatus.topBufferCnt;
+		} else {
+			numPointsToFill = Constants.TALON_TOP_BUFFER_MAX_COUNT - rightStatus.topBufferCnt;
+		}
+
+		while (profileIndex < profiles[0].length && profileIndex < profiles[1].length && numPointsToFill > 0) {
 
 			leftPoint.position = profiles[0][profileIndex][0];
 			rightPoint.position = profiles[1][profileIndex][0];
@@ -245,12 +254,12 @@ public class ProfileHandler {
 			talons[0].pushMotionProfileTrajectory(leftPoint);
 			talons[1].pushMotionProfileTrajectory(rightPoint);
 
-			talons[0].getMotionProfileStatus(leftStatus);
-			talons[1].getMotionProfileStatus(rightStatus);
-
 			profileIndex++;
+			numPointsToFill--;
 		}
 
+		talons[0].getMotionProfileStatus(leftStatus);
+		talons[1].getMotionProfileStatus(rightStatus);
 	}
 
 	/**
@@ -304,8 +313,12 @@ public class ProfileHandler {
 	 */
 	class PeriodicBufferProcessor implements java.lang.Runnable {
 		public void run() {
-			talons[0].processMotionProfileBuffer();
-			talons[1].processMotionProfileBuffer();
+			if (leftStatus.btmBufferCnt < Constants.TALON_BTM_BUFFER_MAX_COUNT) {
+				talons[0].processMotionProfileBuffer();
+			}
+			if (rightStatus.btmBufferCnt < Constants.TALON_BTM_BUFFER_MAX_COUNT) {
+				talons[1].processMotionProfileBuffer();
+			}
 		}
 	}
 
