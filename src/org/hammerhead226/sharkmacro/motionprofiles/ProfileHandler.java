@@ -160,7 +160,7 @@ public class ProfileHandler {
 		fillTalonsWithMotionProfile();
 		updateMotionProfilesStatuses();
 
-		boolean temp = true;
+		boolean readyToProgress = true;
 
 		switch (executionState) {
 		case WAITING:
@@ -173,22 +173,22 @@ public class ProfileHandler {
 		case STARTED:
 			for (int i = 0; i < statuses.length; i++) {
 				if (!(statuses[i].btmBufferCnt > Constants.MINIMUM_POINTS_IN_TALON)) {
-					temp = false;
+					readyToProgress = false;
 				}
 			}
-			if (temp) {
+			if (readyToProgress) {
 				setMode(SetValueMotionProfile.Enable);
 				executionState = ExecutionState.EXECUTING;
 			}
 			break;
 		case EXECUTING:
-			temp = true;
+			readyToProgress = true;
 			for (int i = 0; i < statuses.length; i++) {
 				if (!(statuses[i].activePointValid && statuses[i].isLast)) {
-					temp = false;
+					readyToProgress = false;
 				}
 			}
-			if (temp) {
+			if (readyToProgress) {
 				onFinish();
 			}
 			break;
