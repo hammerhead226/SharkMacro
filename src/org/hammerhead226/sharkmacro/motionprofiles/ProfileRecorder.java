@@ -30,34 +30,34 @@ public class ProfileRecorder {
 	/**
 	 * Holds the recorded positions of the left Talon.
 	 */
-	private ArrayList<Integer> leftPosition = new ArrayList<Integer>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Double> leftPosition = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	/**
 	 * Holds the recorded velocities of the left Talon.
 	 */
-	private ArrayList<Integer> leftVelocity = new ArrayList<Integer>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Double> leftVoltage = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	/**
 	 * Holds the recorded positions of the right Talon.
 	 */
-	private ArrayList<Integer> rightPosition = new ArrayList<Integer>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Double> rightPosition = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	/**
 	 * Holds the recorded velocities of the right Talon.
 	 */
-	private ArrayList<Integer> rightVelocity = new ArrayList<Integer>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Double> rightVoltage = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	/**
 	 * A list of the lists holding the Talons' positions and velocities.
 	 */
-	private ArrayList<ArrayList<Integer>> lists;
-	
+	private ArrayList<ArrayList<Double>> lists;
+
 	/**
 	 * Object that takes a runnable class and starts a new thread to call its
 	 * {@link java.lang.Runnable#run() run()} method periodically.
 	 */
 	Notifier thread;
-	
+
 	Object listLock = new Object();
 
 	/**
@@ -93,12 +93,12 @@ public class ProfileRecorder {
 		thread.stop();
 
 		synchronized (listLock) {
-			lists = new ArrayList<ArrayList<Integer>>() {
+			lists = new ArrayList<ArrayList<Double>>() {
 				{
 					add(leftPosition);
-					add(leftVelocity);
+					add(leftVoltage);
 					add(rightPosition);
-					add(rightVelocity);
+					add(rightVoltage);
 				}
 			};
 		}
@@ -137,11 +137,11 @@ public class ProfileRecorder {
 		 */
 		public void run() {
 			synchronized (listLock) {
-				leftPosition.add(talons[0].getSelectedSensorPosition(0));
-				leftVelocity.add(talons[0].getSelectedSensorVelocity(0));
+				leftPosition.add((double) talons[0].getSelectedSensorPosition(0));
+				leftVoltage.add(talons[0].getMotorOutputVoltage());
 
-				rightPosition.add(talons[1].getSelectedSensorPosition(0));
-				rightVelocity.add(talons[1].getSelectedSensorVelocity(0));
+				rightPosition.add((double) talons[1].getSelectedSensorPosition(0));
+				rightVoltage.add(talons[1].getMotorOutputVoltage());
 			}
 		}
 	}
