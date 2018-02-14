@@ -77,14 +77,15 @@ public class ProfileHandler {
 	private boolean started = false;
 
 	/**
-	 * The status of {@link #leftTalon}.
+	 * List of {@link com.ctre.phoenix.motion.MotionProfileStatus
+	 * MotionProfileStatus} objects for each talon.
 	 */
-	private MotionProfileStatus leftStatus = new MotionProfileStatus();
+	private MotionProfileStatus[] statuses;
 
 	/**
-	 * The status of {@link #rightTalon}.
+	 * List of trajectory points to be pushed to each talon.
 	 */
-	private MotionProfileStatus rightStatus = new MotionProfileStatus();
+	private TrajectoryPoint[] trajPoints;
 
 	/**
 	 * Constructs a new {@link MotionProfileHandler} object that will handle the
@@ -102,12 +103,21 @@ public class ProfileHandler {
 		this.talons = talons;
 		this.pidSlotIdxs = pidSlotIdxs;
 		this.executionState = ExecutionState.WAITING;
+		this.statuses = new MotionProfileStatus[talons.length];
+		for (int i = 0; i < statuses.length; i++) {
+			statuses[i] = new MotionProfileStatus();
+		}
+		this.trajPoints = new TrajectoryPoint[talons.length];
+		for (int i = 0; i < trajPoints.length; i++) {
+			trajPoints[i] = new TrajectoryPoint();
+		}
 
 		bufferThread = new Notifier(new PeriodicBufferProcessor());
 		bufferThread.startPeriodic(Constants.DT_SECONDS / 2.0);
 
-		this.talons[0].changeMotionControlFramePeriod(Constants.MOTIONCONTROL_FRAME_PERIOD);
-		this.talons[1].changeMotionControlFramePeriod(Constants.MOTIONCONTROL_FRAME_PERIOD);
+		for (int i = 0; i < talons.length; i++) {
+			this.talons[i].changeMotionControlFramePeriod(Constants.MOTIONCONTROL_FRAME_PERIOD);
+		}
 
 		executorThread = new Notifier(new PeriodicExecutor());
 	}
@@ -137,8 +147,9 @@ public class ProfileHandler {
 		bufferThread.stop();
 		executorThread.stop();
 		setMode(SetValueMotionProfile.Disable);
-		talons[0].clearMotionProfileTrajectories();
-		talons[1].clearMotionProfileTrajectories();
+		for (int i = 0; i < talons.length; i++) {
+			talons[i].clearMotionProfileTrajectories();
+		}
 	}
 
 	/**
@@ -147,8 +158,9 @@ public class ProfileHandler {
 	 */
 	public void manage() {
 		fillTalonsWithMotionProfile();
-		talons[0].getMotionProfileStatus(leftStatus);
-		talons[1].getMotionProfileStatus(rightStatus);
+		updateMotionProfilesStatuses();
+
+		boolean readyToProgress = true;
 
 		switch (executionState) {
 		case WAITING:
@@ -159,15 +171,24 @@ public class ProfileHandler {
 			}
 			break;
 		case STARTED:
-			if (leftStatus.btmBufferCnt > Constants.MINIMUM_POINTS_IN_TALON
-					&& rightStatus.btmBufferCnt > Constants.MINIMUM_POINTS_IN_TALON) {
+			for (int i = 0; i < statuses.length; i++) {
+				if (statuses[i].btmBufferCnt <= Constants.MINIMUM_POINTS_IN_TALON) {
+					readyToProgress = false;
+				}
+			}
+			if (readyToProgress) {
 				setMode(SetValueMotionProfile.Enable);
 				executionState = ExecutionState.EXECUTING;
 			}
 			break;
 		case EXECUTING:
-			if ((leftStatus.activePointValid && leftStatus.isLast)
-					&& (rightStatus.activePointValid && rightStatus.isLast)) {
+			readyToProgress = true;
+			for (int i = 0; i < statuses.length; i++) {
+				if (!statuses[i].activePointValid || !statuses[i].isLast) {
+					readyToProgress = false;
+				}
+			}
+			if (readyToProgress) {
 				onFinish();
 			}
 			break;
@@ -182,84 +203,83 @@ public class ProfileHandler {
 	 */
 	private void setMode(SetValueMotionProfile mode) {
 		this.currentMode = mode;
-		talons[0].set(ControlMode.MotionProfile, mode.value);
-		talons[1].set(ControlMode.MotionProfile, mode.value);
+		for (int i = 0; i < talons.length; i++) {
+			talons[i].set(ControlMode.MotionProfile, mode.value);
+		}
 	}
 
 	/**
-	 * Fill the Talons' top-level buffer with a given motion profile.
+	 * Fill the talons' top-level buffer with a given motion profile.
 	 * 
 	 */
 	private void fillTalonsWithMotionProfile() {
 
-		// maybe need two point objects?
-		TrajectoryPoint leftPoint = new TrajectoryPoint();
-		TrajectoryPoint rightPoint = new TrajectoryPoint();
-
 		if (profileIndex == 0) {
-			talons[0].clearMotionProfileTrajectories();
-			talons[0].configMotionProfileTrajectoryPeriod(TrajectoryDuration.Trajectory_Duration_0ms.value, 0);
-			talons[0].clearMotionProfileHasUnderrun(0);
-			talons[1].clearMotionProfileTrajectories();
-			talons[1].configMotionProfileTrajectoryPeriod(TrajectoryDuration.Trajectory_Duration_0ms.value, 0);
-			talons[1].clearMotionProfileHasUnderrun(0);
+			for (int i = 0; i < talons.length; i++) {
+				talons[i].clearMotionProfileTrajectories();
+				talons[i].configMotionProfileTrajectoryPeriod(TrajectoryDuration.Trajectory_Duration_0ms.value, 0);
+				talons[i].clearMotionProfileHasUnderrun(0);
+			}
 		}
 
-		talons[0].getMotionProfileStatus(leftStatus);
-		talons[1].getMotionProfileStatus(rightStatus);
+		updateMotionProfilesStatuses();
 
-		int numPointsToFill;
-		if (leftStatus.topBufferCnt > rightStatus.topBufferCnt) {
-			numPointsToFill = Constants.TALON_TOP_BUFFER_MAX_COUNT - leftStatus.topBufferCnt;
-		} else {
-			numPointsToFill = Constants.TALON_TOP_BUFFER_MAX_COUNT - rightStatus.topBufferCnt;
+		int maxFilled = statuses[0].topBufferCnt;
+		for (int i = 0; i < statuses.length; i++) {
+			if (statuses[i].topBufferCnt > maxFilled) {
+				maxFilled = statuses[i].topBufferCnt;
+			}
 		}
 
-		while (profileIndex < profiles[0].length && profileIndex < profiles[1].length && numPointsToFill > 0) {
+		int numPointsToFill = Constants.TALON_TOP_BUFFER_MAX_COUNT - maxFilled;
 
-			leftPoint.position = profiles[0][profileIndex][0];
-			rightPoint.position = profiles[1][profileIndex][0];
+		boolean finished = false;
 
-			leftPoint.velocity = profiles[0][profileIndex][1];
-			rightPoint.velocity = profiles[1][profileIndex][1];
+		while (!finished && numPointsToFill > 0) {
+			for (int i = 0; i < trajPoints.length; i++) {
 
-			leftPoint.headingDeg = 0;
-			rightPoint.headingDeg = 0;
+				if (profileIndex >= profiles[i].length) {
+					finished = true;
+					break;
+				}
 
-			leftPoint.timeDur = toTrajectoryDuration((int) profiles[0][profileIndex][2]);
-			rightPoint.timeDur = toTrajectoryDuration((int) profiles[1][profileIndex][2]);
+				trajPoints[i].position = profiles[i][profileIndex][0];
+				trajPoints[i].velocity = profiles[i][profileIndex][1];
+				trajPoints[i].headingDeg = 0;
+				trajPoints[i].timeDur = toTrajectoryDuration((int) profiles[i][profileIndex][2]);
+				trajPoints[i].profileSlotSelect0 = pidSlotIdxs[i];
+				trajPoints[i].profileSlotSelect1 = 0;
 
-			leftPoint.profileSlotSelect0 = pidSlotIdxs[0];
-			rightPoint.profileSlotSelect0 = pidSlotIdxs[1];
+				trajPoints[i].zeroPos = false;
+				if (profileIndex == 0) {
+					trajPoints[i].zeroPos = true;
+				}
 
-			leftPoint.profileSlotSelect1 = 0;
-			rightPoint.profileSlotSelect1 = 0;
-
-			leftPoint.zeroPos = false;
-			rightPoint.zeroPos = false;
-			if (profileIndex == 0) {
-				leftPoint.zeroPos = true;
-				rightPoint.zeroPos = true;
+				trajPoints[i].isLastPoint = false;
+				if ((profileIndex + 1) == profiles[i].length) {
+					trajPoints[i].isLastPoint = true;
+				}
 			}
 
-			leftPoint.isLastPoint = false;
-			rightPoint.isLastPoint = false;
-			if ((profileIndex + 1) == profiles[0].length) {
-				leftPoint.isLastPoint = true;
+			for (int i = 0; i < trajPoints.length; i++) {
+				talons[i].pushMotionProfileTrajectory(trajPoints[i]);
 			}
-			if ((profileIndex + 1) == profiles[1].length) {
-				rightPoint.isLastPoint = true;
-			}
-
-			talons[0].pushMotionProfileTrajectory(leftPoint);
-			talons[1].pushMotionProfileTrajectory(rightPoint);
 
 			profileIndex++;
 			numPointsToFill--;
 		}
 
-		talons[0].getMotionProfileStatus(leftStatus);
-		talons[1].getMotionProfileStatus(rightStatus);
+		updateMotionProfilesStatuses();
+	}
+
+	/**
+	 * Updates the {@link com.ctre.phoenix.motion.MotionProfileStatus
+	 * MotionProfileStatus} objects of each talon.
+	 */
+	public void updateMotionProfilesStatuses() {
+		for (int i = 0; i < talons.length; i++) {
+			talons[i].getMotionProfileStatus(statuses[i]);
+		}
 	}
 
 	/**
@@ -287,7 +307,7 @@ public class ProfileHandler {
 	 *         CANTalon.MotionProfileStatus} objects of each of the talons.
 	 */
 	public MotionProfileStatus[] getStatus() {
-		return new MotionProfileStatus[] { leftStatus, rightStatus };
+		return statuses;
 	}
 
 	/**
@@ -313,11 +333,10 @@ public class ProfileHandler {
 	 */
 	class PeriodicBufferProcessor implements java.lang.Runnable {
 		public void run() {
-			if (leftStatus.btmBufferCnt < Constants.TALON_BTM_BUFFER_MAX_COUNT) {
-				talons[0].processMotionProfileBuffer();
-			}
-			if (rightStatus.btmBufferCnt < Constants.TALON_BTM_BUFFER_MAX_COUNT) {
-				talons[1].processMotionProfileBuffer();
+			for (int i = 0; i < talons.length; i++) {
+				if (statuses[i].btmBufferCnt < Constants.TALON_BTM_BUFFER_MAX_COUNT) {
+					talons[i].processMotionProfileBuffer();
+				}
 			}
 		}
 	}
