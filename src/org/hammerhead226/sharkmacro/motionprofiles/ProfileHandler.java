@@ -172,7 +172,7 @@ public class ProfileHandler {
 			break;
 		case STARTED:
 			for (int i = 0; i < statuses.length; i++) {
-				if (!(statuses[i].btmBufferCnt > Constants.MINIMUM_POINTS_IN_TALON)) {
+				if (statuses[i].btmBufferCnt <= Constants.MINIMUM_POINTS_IN_TALON) {
 					readyToProgress = false;
 				}
 			}
@@ -184,7 +184,7 @@ public class ProfileHandler {
 		case EXECUTING:
 			readyToProgress = true;
 			for (int i = 0; i < statuses.length; i++) {
-				if (!(statuses[i].activePointValid && statuses[i].isLast)) {
+				if (!statuses[i].activePointValid || !statuses[i].isLast) {
 					readyToProgress = false;
 				}
 			}
