@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 
 /**
- * Class to easily manage motion profile execution on a Talon SRX. Some logic
+ * Class to easily manage motion profile execution on a number of Talon SRXs. Some logic
  * taken from <a href=
  * "https://github.com/CrossTheRoadElec/Phoenix-Examples-Languages/blob/master/Java/MotionProfile/src/org/usfirst/frc/team217/robot/MotionProfileExample.java">here</a>
  * 
