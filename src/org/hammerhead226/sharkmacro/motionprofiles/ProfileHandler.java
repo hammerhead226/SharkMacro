@@ -232,9 +232,17 @@ public class ProfileHandler {
 		}
 
 		int numPointsToFill = Constants.TALON_TOP_BUFFER_MAX_COUNT - maxFilled;
+		
+		boolean notFinished = true;
 
-		while (profileIndex < profiles[0].length && profileIndex < profiles[1].length && numPointsToFill > 0) {
+		while (notFinished && numPointsToFill > 0) {
 			for (int i = 0; i < trajPoints.length; i++) {
+				
+				if (profileIndex >= profiles[i].length) {
+					notFinished = false;
+					break;
+				}
+				
 				trajPoints[i].position = profiles[i][profileIndex][0];
 				trajPoints[i].velocity = profiles[i][profileIndex][1];
 				trajPoints[i].headingDeg = 0;
