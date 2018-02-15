@@ -96,7 +96,7 @@ public class ActionRecorder {
 	/**
 	 * @return {@code true} if the {@code ActionRecorder} is currently recording, {@code false} if not
 	 */
-	public boolean isRecording() {
+	public static boolean isRecording() {
 		return isRecording;
 	}
 
