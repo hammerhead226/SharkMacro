@@ -25,7 +25,7 @@ public class ProfileRecorder {
 	/**
 	 * Whether the {@link ProfileRecorder} will record voltage or speed.
 	 */
-	private boolean recordingVoltage;
+	private RecordingType recordingType;
 
 	/**
 	 * An array of the Talons being recorded.
@@ -78,11 +78,7 @@ public class ProfileRecorder {
 	public ProfileRecorder(TalonSRX left, TalonSRX right, RecordingType recordingType) {
 		talons = new TalonSRX[] { left, right };
 		thread = new Notifier(new PeriodicRunnable());
-		if (type == RecordingType.VOLTAGE) {
-			this.recordingVoltage = true;
-		} else {
-			this.recordingVoltage = false;
-		}
+		this.recordingType = recordingType;
 	}
 
 	/**
@@ -148,16 +144,16 @@ public class ProfileRecorder {
 		 * Add position and velocity readings from the Talons to their respective list.
 		 */
 		public void run() {
-			if (recordingVoltage) {
-				synchronized (listLock) {
+			synchronized (listLock) {
+				if (recordingType == RecordingType.VOLTAGE) {
+
 					leftPosition.add((double) talons[0].getSelectedSensorPosition(0));
 					leftFeedforwardValues.add(talons[0].getMotorOutputVoltage());
 
 					rightPosition.add((double) talons[1].getSelectedSensorPosition(0));
 					rightFeedforwardValues.add(talons[1].getMotorOutputVoltage());
-				}
-			} else {
-				synchronized (listLock) {
+
+				} else {
 					leftPosition.add((double) talons[0].getSelectedSensorPosition(0));
 					leftFeedforwardValues.add((double) talons[0].getSelectedSensorVelocity(0));
 
