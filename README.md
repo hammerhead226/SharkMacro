@@ -13,18 +13,17 @@
 
 * Configure left and right talon settings
 
-  * SharkMacro uses 10ms trajectory points by default so no extra trajectory time must be added
-        ```java
-        talon.configMotionProfileTrajectoryPeriod(0, 0);
-        ```
-  * Correct feedback sensor must be set
-        ```java
-        talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-        ```
-  * Sensor values will not be updated fast enough for the recorder unless the feedback status frame is set manually
-        ```java
-        talon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5, 0);
-        ```
+  * SharkMacro uses 10ms trajectory points by default so no extra trajectory time must be added:
+
+    `talon.configMotionProfileTrajectoryPeriod(0, 0);`
+        
+  * Correct feedback sensor must be set:
+
+    `talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);`
+
+  * Sensor values will not be updated fast enough for the recorder unless the feedback status frame is set manually:
+        
+    `talon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5, 0);`
 ---
 
 * Record a profile
