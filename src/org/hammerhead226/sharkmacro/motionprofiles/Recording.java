@@ -84,20 +84,20 @@ public class Recording {
 		}
 
 		ArrayList<Double> leftPosition = recordings.get(0);
-		ArrayList<Double> leftFFValues = recordings.get(1);
+		ArrayList<Double> leftFeedforwardValues = recordings.get(1);
 		ArrayList<Double> rightPosition = recordings.get(2);
-		ArrayList<Double> rightFFValues = recordings.get(3);
+		ArrayList<Double> rightFeedforwardValues = recordings.get(3);
 
 		double[][] leftProfile = new double[minSize][3];
 		double[][] rightProfile = new double[minSize][3];
 
 		for (int i = 0; i < minSize; i++) {
 			leftProfile[i][0] = leftPosition.get(i);
-			leftProfile[i][1] = leftFFValues.get(i);
+			leftProfile[i][1] = leftFeedforwardValues.get(i);
 			leftProfile[i][2] = Constants.DT_MS;
 
 			rightProfile[i][0] = rightPosition.get(i);
-			rightProfile[i][1] = rightFFValues.get(i);
+			rightProfile[i][1] = rightFeedforwardValues.get(i);
 			rightProfile[i][2] = Constants.DT_MS;
 		}
 		return new Profile(leftProfile, rightProfile, leftTalon, rightTalon);

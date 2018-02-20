@@ -40,7 +40,7 @@ public class ProfileRecorder {
 	/**
 	 * Holds the recorded velocities of the left Talon.
 	 */
-	private ArrayList<Double> leftFFValues = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Double> leftFeedforwardValues = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	/**
 	 * Holds the recorded positions of the right Talon.
@@ -50,7 +50,7 @@ public class ProfileRecorder {
 	/**
 	 * Holds the recorded velocities of the right Talon.
 	 */
-	private ArrayList<Double> rightFFValues = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Double> rightFeedforwardValues = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	/**
 	 * A list of the lists holding the Talons' positions and velocities.
@@ -106,9 +106,9 @@ public class ProfileRecorder {
 			lists = new ArrayList<ArrayList<Double>>() {
 				{
 					add(leftPosition);
-					add(leftFFValues);
+					add(leftFeedforwardValues);
 					add(rightPosition);
-					add(rightFFValues);
+					add(rightFeedforwardValues);
 				}
 			};
 		}
@@ -149,18 +149,18 @@ public class ProfileRecorder {
 			if (recordingVoltage) {
 				synchronized (listLock) {
 					leftPosition.add((double) talons[0].getSelectedSensorPosition(0));
-					leftFFValues.add(talons[0].getMotorOutputVoltage());
+					leftFeedforwardValues.add(talons[0].getMotorOutputVoltage());
 
 					rightPosition.add((double) talons[1].getSelectedSensorPosition(0));
-					rightFFValues.add(talons[1].getMotorOutputVoltage());
+					rightFeedforwardValues.add(talons[1].getMotorOutputVoltage());
 				}
 			} else {
 				synchronized (listLock) {
 					leftPosition.add((double) talons[0].getSelectedSensorPosition(0));
-					leftFFValues.add((double) talons[0].getSelectedSensorVelocity(0));
+					leftFeedforwardValues.add((double) talons[0].getSelectedSensorVelocity(0));
 
 					rightPosition.add((double) talons[1].getSelectedSensorPosition(0));
-					rightFFValues.add((double) talons[1].getSelectedSensorVelocity(0));
+					rightFeedforwardValues.add((double) talons[1].getSelectedSensorVelocity(0));
 				}
 			}
 		}
