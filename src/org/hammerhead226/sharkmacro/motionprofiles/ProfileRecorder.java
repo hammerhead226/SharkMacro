@@ -21,7 +21,7 @@ public class ProfileRecorder {
 	 * Whether the {@link ProfileRecorder} is recording or not.
 	 */
 	private boolean isRecording = false;
-	
+
 	/**
 	 * Whether the {@link ProfileRecorder} will record voltage or speed.
 	 */
@@ -40,7 +40,8 @@ public class ProfileRecorder {
 	/**
 	 * Holds the recorded velocities of the left Talon.
 	 */
-	private ArrayList<Double> leftFeedforwardValues = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Double> leftFeedforwardValues = new ArrayList<Double>(
+			Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	/**
 	 * Holds the recorded positions of the right Talon.
@@ -50,7 +51,8 @@ public class ProfileRecorder {
 	/**
 	 * Holds the recorded velocities of the right Talon.
 	 */
-	private ArrayList<Double> rightFeedforwardValues = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Double> rightFeedforwardValues = new ArrayList<Double>(
+			Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	/**
 	 * A list of the lists holding the Talons' positions and velocities.
