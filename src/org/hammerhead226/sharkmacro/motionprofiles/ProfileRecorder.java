@@ -72,8 +72,10 @@ public class ProfileRecorder {
 	 *            the left Talon
 	 * @param right
 	 *            the right Talon
+	 * @param recordingType
+	 *            the type of data that will be recorded, either voltage or velocity
 	 */
-	public ProfileRecorder(TalonSRX left, TalonSRX right, RecordingType type) {
+	public ProfileRecorder(TalonSRX left, TalonSRX right, RecordingType recordingType) {
 		talons = new TalonSRX[] { left, right };
 		thread = new Notifier(new PeriodicRunnable());
 		if (type == RecordingType.VOLTAGE) {
