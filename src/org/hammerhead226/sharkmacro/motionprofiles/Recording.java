@@ -84,25 +84,25 @@ public class Recording {
 		}
 
 		ArrayList<Double> leftPosition = recordings.get(0);
-		ArrayList<Double> leftVoltage = recordings.get(1);
+		ArrayList<Double> leftFFValues = recordings.get(1);
 		ArrayList<Double> rightPosition = recordings.get(2);
-		ArrayList<Double> rightVoltage = recordings.get(3);
+		ArrayList<Double> rightFFValues = recordings.get(3);
 
 		double[][] leftProfile = new double[minSize][3];
 		double[][] rightProfile = new double[minSize][3];
 
 		for (int i = 0; i < minSize; i++) {
 			leftProfile[i][0] = leftPosition.get(i);
-			leftProfile[i][1] = leftVoltage.get(i);
+			leftProfile[i][1] = leftFFValues.get(i);
 			leftProfile[i][2] = Constants.DT_MS;
 
 			rightProfile[i][0] = rightPosition.get(i);
-			rightProfile[i][1] = rightVoltage.get(i);
+			rightProfile[i][1] = rightFFValues.get(i);
 			rightProfile[i][2] = Constants.DT_MS;
 		}
 		return new Profile(leftProfile, rightProfile, leftTalon, rightTalon);
 	}
-
+	
 	/**
 	 * Converts an {@code ArrayList} of type Integer to an {@code ArrayList} of type
 	 * Double.

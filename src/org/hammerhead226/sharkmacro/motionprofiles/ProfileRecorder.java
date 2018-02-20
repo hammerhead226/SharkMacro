@@ -21,6 +21,11 @@ public class ProfileRecorder {
 	 * Whether the {@link ProfileRecorder} is recording or not.
 	 */
 	private boolean isRecording = false;
+	
+	/**
+	 * Whether the {@link ProfileRecorder} will record voltage or speed.
+	 */
+	private boolean recordingVoltage;
 
 	/**
 	 * An array of the Talons being recorded.
@@ -35,7 +40,7 @@ public class ProfileRecorder {
 	/**
 	 * Holds the recorded velocities of the left Talon.
 	 */
-	private ArrayList<Double> leftVoltage = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Double> leftFFValues = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	/**
 	 * Holds the recorded positions of the right Talon.
@@ -45,7 +50,7 @@ public class ProfileRecorder {
 	/**
 	 * Holds the recorded velocities of the right Talon.
 	 */
-	private ArrayList<Double> rightVoltage = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private ArrayList<Double> rightFFValues = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
 
 	/**
 	 * A list of the lists holding the Talons' positions and velocities.
@@ -68,9 +73,14 @@ public class ProfileRecorder {
 	 * @param right
 	 *            the right Talon
 	 */
-	public ProfileRecorder(TalonSRX left, TalonSRX right) {
+	public ProfileRecorder(TalonSRX left, TalonSRX right, RecordingType type) {
 		talons = new TalonSRX[] { left, right };
 		thread = new Notifier(new PeriodicRunnable());
+		if (type == RecordingType.VOLTAGE) {
+			this.recordingVoltage = true;
+		} else {
+			this.recordingVoltage = false;
+		}
 	}
 
 	/**
@@ -96,9 +106,9 @@ public class ProfileRecorder {
 			lists = new ArrayList<ArrayList<Double>>() {
 				{
 					add(leftPosition);
-					add(leftVoltage);
+					add(leftFFValues);
 					add(rightPosition);
-					add(rightVoltage);
+					add(rightFFValues);
 				}
 			};
 		}
@@ -136,14 +146,27 @@ public class ProfileRecorder {
 		 * Add position and velocity readings from the Talons to their respective list.
 		 */
 		public void run() {
-			synchronized (listLock) {
-				leftPosition.add((double) talons[0].getSelectedSensorPosition(0));
-				leftVoltage.add(talons[0].getMotorOutputVoltage());
+			if (recordingVoltage) {
+				synchronized (listLock) {
+					leftPosition.add((double) talons[0].getSelectedSensorPosition(0));
+					leftFFValues.add(talons[0].getMotorOutputVoltage());
 
-				rightPosition.add((double) talons[1].getSelectedSensorPosition(0));
-				rightVoltage.add(talons[1].getMotorOutputVoltage());
+					rightPosition.add((double) talons[1].getSelectedSensorPosition(0));
+					rightFFValues.add(talons[1].getMotorOutputVoltage());
+				}
+			} else {
+				synchronized (listLock) {
+					leftPosition.add((double) talons[0].getSelectedSensorPosition(0));
+					leftFFValues.add((double) talons[0].getSelectedSensorVelocity(0));
+
+					rightPosition.add((double) talons[1].getSelectedSensorPosition(0));
+					rightFFValues.add((double) talons[1].getSelectedSensorVelocity(0));
+				}
 			}
 		}
 	}
 
+	public enum RecordingType {
+		VELOCITY, VOLTAGE;
+	}
 }
