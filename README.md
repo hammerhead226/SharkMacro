@@ -28,7 +28,7 @@
 
 * Record a profile
     ```java
-    ProfileRecorder recorder = new ProfileReorder(leftTalon, rightTalon);
+    ProfileRecorder recorder = new ProfileRecorder(leftTalon, rightTalon, RecordingType.VOLTAGE/VELOCITY);
     recorder.start();
     ```
 * Save a profile to file
@@ -68,7 +68,7 @@ public class DriveTrain extends Subsystem {
     private TalonSRX leftTalon = new TalonSRX(RobotMap.DT_FL_MOTOR);
     private TalonSRX rightTalon = new TalonSRX(RobotMap.DT_FR_MOTOR);
 
-    private ProfileRecorder r = new ProfileRecorder(leftTalon, rightTalon);
+    private ProfileRecorder r = new ProfileRecorder(leftTalon, rightTalon, RecordingType.VOLTAGE);
 
     public void toggleRecording() {
         if (r.isRecording()) {
