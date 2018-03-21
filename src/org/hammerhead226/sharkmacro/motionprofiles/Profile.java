@@ -107,9 +107,14 @@ public class Profile {
 	 *            the PID slot index to use to execute the right motion profile
 	 */
 	public void execute(int leftPidSlotIdx, int rightPidSlotIdx) {
-		handler = new ProfileHandler(new double[][][] { leftProfile, rightProfile },
-				new TalonSRX[] { leftTalon, rightTalon }, new int[] { leftPidSlotIdx, rightPidSlotIdx });
-		handler.execute();
+		if (leftProfile.length != 0 && rightProfile.length != 0) {
+			handler = new ProfileHandler(new double[][][] { leftProfile, rightProfile },
+					new TalonSRX[] { leftTalon, rightTalon }, new int[] { leftPidSlotIdx, rightPidSlotIdx });
+			handler.execute();
+		} else {
+			DriverStation.getInstance();
+			DriverStation.reportError("Tried to run empty profile!", false);
+		}
 	}
 
 	/**
@@ -121,7 +126,8 @@ public class Profile {
 		if (handler != null) {
 			handler.onInterrupt();
 		} else {
-			DriverStation.getInstance().reportWarning("No instance of ProfileHandler to interrupt!", false);
+			DriverStation.getInstance();
+			DriverStation.reportWarning("No instance of ProfileHandler to interrupt!", false);
 		}
 	}
 
@@ -184,6 +190,9 @@ public class Profile {
 	 * @return the converted array
 	 */
 	private static String[][] toStringArray(double[][] arr) {
+		if (arr.length == 0) {
+			return new String[0][0];
+		}
 		String[][] str = new String[arr.length][arr[0].length];
 		int i = 0;
 		for (double[] d : arr) {
@@ -201,6 +210,9 @@ public class Profile {
 	 * @return the converted array
 	 */
 	private static double[][] toDoubleArray(String[][] arr) {
+		if (arr.length == 0) {
+			return new double[0][0];
+		}
 		double[][] dbl = new double[arr.length][arr[0].length];
 		int i = 0;
 		for (String[] s : arr) {

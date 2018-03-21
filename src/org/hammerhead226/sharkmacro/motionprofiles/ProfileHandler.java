@@ -120,6 +120,10 @@ public class ProfileHandler {
 		}
 
 		executorThread = new Notifier(new PeriodicExecutor());
+		
+		fillTalonsWithMotionProfile();
+		DriverStation.getInstance();
+		DriverStation.reportWarning("PROFILE LOADED", false);
 	}
 
 	/**

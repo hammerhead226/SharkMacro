@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import org.hammerhead226.sharkmacro.Constants;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -33,7 +34,7 @@ public class ActionList implements Iterable<Action> {
 	 * Represents whether this {@link ActionList} has finished executing.
 	 */
 	private boolean isFinished = false;
-	
+
 	/**
 	 * Object that takes a runnable class and starts a new thread to call its
 	 * {@link java.lang.Runnable#run() run()} method periodically.
@@ -74,9 +75,14 @@ public class ActionList implements Iterable<Action> {
 	 * This method starts the execution process of this {@link ActionList}.
 	 */
 	public void execute() {
-		isFinished = false;
-		timer.start();
-		thread.startPeriodic(Constants.DT_SECONDS);
+		if (this.actionList != null) {
+			isFinished = false;
+			timer.start();
+			thread.startPeriodic(Constants.DT_SECONDS);
+		} else {
+			DriverStation.getInstance();
+			DriverStation.reportError("Tried to execute empty ActionList!", false);
+		}
 	}
 
 	/**
@@ -95,9 +101,9 @@ public class ActionList implements Iterable<Action> {
 	 * {@link PeriodicRunnable#run() run()} periodically.
 	 */
 	class PeriodicRunnable implements java.lang.Runnable {
-		
+
 		private ActionList al;
-		
+
 		public PeriodicRunnable(ActionList al) {
 			this.al = al;
 		}
@@ -126,7 +132,8 @@ public class ActionList implements Iterable<Action> {
 	}
 
 	/**
-	 * String representation of each {@link Action} contained in this {@link ActionList}.
+	 * String representation of each {@link Action} contained in this
+	 * {@link ActionList}.
 	 * 
 	 * @return the string representation
 	 */
