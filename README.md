@@ -222,3 +222,9 @@ There are a couple different methods that can be used to access/generate SharkMa
   * `profile0003.csv`
 
 would return `profile0003`.
+
+## Things to look out for
+
+* Be sure to have your code call `actionList.execute()` and `profile.execute()` at the same time. If not called close to simultaneously, the robot's movement and its actions will be out of sync.
+
+* Be sure to set PID gains in the talons that will be playing back your recorded profile. Not much, if any, PID tuning is required with motion profiling. I found that a P gain of between 0.5 and 1.5 on both talons and I, D and F gains of 0 worked well. (Tested on 4-CIM West Coast drivetrain with ~55 lbs. of weight on it)
