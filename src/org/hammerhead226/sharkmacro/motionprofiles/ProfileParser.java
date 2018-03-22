@@ -8,6 +8,8 @@ import org.hammerhead226.sharkmacro.Parser;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 /**
  * Handles the reading and writing of {@link Profile}s.
  * 
@@ -62,8 +64,14 @@ public final class ProfileParser extends Parser {
 	 * 
 	 * @return a new {@code Profile} instance
 	 */
-	public Profile toObject(TalonSRX leftTalon, TalonSRX rightTalon) {
+	public Profile toObject(TalonSRX leftTalon, TalonSRX rightTalon, int leftPidSlotIdx, int rightPidSlotIdx) {
 		List<String[]> profileRaw = readFromFile();
+		
+		if (profileRaw == null) {
+			DriverStation.getInstance();
+			DriverStation.reportError("Tried to load nonexistant Profile from name: " + super.filename, false);
+			return new Profile(new double[0][0], new double[0][0], leftTalon, rightTalon, leftPidSlotIdx, rightPidSlotIdx);
+		}
 
 		// Process read values into Profile
 		String[][] left = new String[profileRaw.size()][3];
@@ -79,7 +87,7 @@ public final class ProfileParser extends Parser {
 			right[i][2] = profileRaw.get(i)[4];
 		}
 
-		Profile p = new Profile(left, right, leftTalon, rightTalon);
+		Profile p = new Profile(left, right, leftTalon, rightTalon, leftPidSlotIdx, rightPidSlotIdx);
 
 		return p;
 	}

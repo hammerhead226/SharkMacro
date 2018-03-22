@@ -2,7 +2,6 @@ package org.hammerhead226.sharkmacro.motionprofiles;
 
 import java.util.Arrays;
 
-import com.ctre.CANTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -64,13 +63,17 @@ public class Profile {
 	 * @param rightTalon
 	 *            the Talon to execute the right profile with
 	 */
-	public Profile(double[][] leftProfile, double[][] rightProfile, TalonSRX leftTalon, TalonSRX rightTalon) {
+	public Profile(double[][] leftProfile, double[][] rightProfile, TalonSRX leftTalon, TalonSRX rightTalon,
+			int leftPidSlotIdx, int rightPidSlotIdx) {
 		this.leftProfile = leftProfile;
 		this.rightProfile = rightProfile;
 		this.leftTalon = leftTalon;
 		this.rightTalon = rightTalon;
 		this.length = this.leftProfile.length;
 		this.dt = (int) this.leftProfile[0][2];
+
+		handler = new ProfileHandler(new double[][][] { leftProfile, rightProfile },
+				new TalonSRX[] { leftTalon, rightTalon }, new int[] { leftPidSlotIdx, rightPidSlotIdx });
 	}
 
 	/**
@@ -87,13 +90,18 @@ public class Profile {
 	 * @param rightTalon
 	 *            the Talon to execute the right profile with
 	 */
-	public Profile(String[][] leftProfile, String[][] rightProfile, TalonSRX leftTalon, TalonSRX rightTalon) {
+	public Profile(String[][] leftProfile, String[][] rightProfile, TalonSRX leftTalon, TalonSRX rightTalon,
+			int leftPidSlotIdx, int rightPidSlotIdx) {
 		this.leftProfile = toDoubleArray(leftProfile);
 		this.rightProfile = toDoubleArray(rightProfile);
 		this.leftTalon = leftTalon;
 		this.rightTalon = rightTalon;
 		this.length = this.leftProfile.length;
 		this.dt = (int) this.leftProfile[0][2];
+
+		handler = new ProfileHandler(new double[][][] { this.leftProfile, this.rightProfile },
+				new TalonSRX[] { leftTalon, rightTalon }, new int[] { leftPidSlotIdx, rightPidSlotIdx });
+
 	}
 
 	/**
@@ -106,10 +114,13 @@ public class Profile {
 	 * @param rightGainsProfile
 	 *            the PID slot index to use to execute the right motion profile
 	 */
-	public void execute(int leftPidSlotIdx, int rightPidSlotIdx) {
-		handler = new ProfileHandler(new double[][][] { leftProfile, rightProfile },
-				new TalonSRX[] { leftTalon, rightTalon }, new int[] { leftPidSlotIdx, rightPidSlotIdx });
-		handler.execute();
+	public void execute() {
+		if (leftProfile.length != 0 && rightProfile.length != 0) {
+			handler.execute();
+		} else {
+			DriverStation.getInstance();
+			DriverStation.reportError("Tried to run empty profile!", false);
+		}
 	}
 
 	/**
@@ -121,7 +132,8 @@ public class Profile {
 		if (handler != null) {
 			handler.onInterrupt();
 		} else {
-			DriverStation.getInstance().reportWarning("No instance of ProfileHandler to interrupt!", false);
+			DriverStation.getInstance();
+			DriverStation.reportWarning("No instance of ProfileHandler to interrupt!", false);
 		}
 	}
 
@@ -184,6 +196,9 @@ public class Profile {
 	 * @return the converted array
 	 */
 	private static String[][] toStringArray(double[][] arr) {
+		if (arr.length == 0) {
+			return new String[0][0];
+		}
 		String[][] str = new String[arr.length][arr[0].length];
 		int i = 0;
 		for (double[] d : arr) {
@@ -201,6 +216,9 @@ public class Profile {
 	 * @return the converted array
 	 */
 	private static double[][] toDoubleArray(String[][] arr) {
+		if (arr.length == 0) {
+			return new double[0][0];
+		}
 		double[][] dbl = new double[arr.length][arr[0].length];
 		int i = 0;
 		for (String[] s : arr) {

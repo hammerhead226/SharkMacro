@@ -42,7 +42,7 @@ public abstract class Parser {
 	/**
 	 * Filename to read from or write a new file with.
 	 */
-	private final String filename;
+	protected final String filename;
 
 	/**
 	 * HashMap object representing a cache of all previously loaded
@@ -117,8 +117,10 @@ public abstract class Parser {
 			reader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			return null;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return null;
 		}
 
 		cache.put(filename, rawFile);

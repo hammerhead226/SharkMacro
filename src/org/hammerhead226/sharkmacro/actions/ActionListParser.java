@@ -7,6 +7,8 @@ import org.hammerhead226.sharkmacro.Constants;
 import org.hammerhead226.sharkmacro.Parser;
 import org.hammerhead226.sharkmacro.motionprofiles.Profile;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 /**
  * Handles the reading and writing of {@link ActionList}s.
  * 
@@ -37,7 +39,8 @@ public class ActionListParser extends Parser {
 	 */
 	public boolean writeToFile(ActionList al) {
 		if (al.getSize() == 0) {
-			System.out.println("Tried to write empty ActionList");
+			DriverStation.getInstance();
+			DriverStation.reportWarning("Tried to write empty ActionList!", false);
 			return false;
 		}
 
@@ -65,6 +68,12 @@ public class ActionListParser extends Parser {
 	public ActionList toObject() {
 
 		List<String[]> actionListRaw = readFromFile();
+		
+		if (actionListRaw == null) {
+			DriverStation.getInstance();
+			DriverStation.reportError("Tried to load nonexistant ActionList from name: " + super.filename, false);
+			return new ActionList(null);
+		}
 
 		ArrayList<Action> list = new ArrayList<Action>(Constants.ACTIONRECORDER_LIST_DEFAULT_LENGTH);
 		for (String[] s : actionListRaw) {

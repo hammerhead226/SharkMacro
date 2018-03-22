@@ -59,7 +59,7 @@ public class Recording {
 	 * 
 	 * @return a new {@link Profile} containing the new motion profiles
 	 */
-	public Profile toProfile() {
+	public Profile toProfile(int leftPidSlotIdx, int rightPidSlotIdx) {
 
 		// Remove differential in list size
 		int minSize = Integer.MAX_VALUE;
@@ -100,7 +100,7 @@ public class Recording {
 			rightProfile[i][1] = rightFeedforwardValues.get(i);
 			rightProfile[i][2] = Constants.DT_MS;
 		}
-		return new Profile(leftProfile, rightProfile, leftTalon, rightTalon);
+		return new Profile(leftProfile, rightProfile, leftTalon, rightTalon, leftPidSlotIdx, rightPidSlotIdx);
 	}
 	
 	/**
