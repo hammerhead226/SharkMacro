@@ -84,6 +84,15 @@ public class ActionList implements Iterable<Action> {
 			DriverStation.reportError("Tried to execute empty ActionList!", false);
 		}
 	}
+	
+	/**
+	 * Should be called during execution if the process is interrupted. Stops execution.
+	 */
+	public void onInterrupt() {
+		timer.stop();
+		timer.reset();
+		thread.stop();
+	}
 
 	/**
 	 * This method returns this class's {@link #finished} property.
