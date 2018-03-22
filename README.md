@@ -33,15 +33,15 @@
     ```
 * Save a profile to file
     ```java
-    Profile p = recorder.stop().toProfile();
+    Profile p = recorder.stop().toProfile(leftPIDSlotIdx, rightPIDSlotIdx);
     ProfileParser parser = new ProfileParser(filename);
     parser.writeToFile(p);
     ```
 * Load and play a profile from file
     ```java
     ProfileParser parser = new ProfileParser(filenameToLoad);
-    Profile p = parser.toObject(leftTalon, rightTalon);
-    p.execute(leftPIDSlot, rightPIDSlot);
+    Profile p = parser.toObject(leftTalon, rightTalon, leftPIDSlotIdx, rightPIDSlotIdx);
+    p.execute();
     ```
 Teams can use a Command to toggle recording:
 
@@ -73,7 +73,7 @@ public class DriveTrain extends Subsystem {
     public void toggleRecording() {
         if (r.isRecording()) {
             ProfileParser p = new ProfileParser(ProfileParser.getNewFilename());
-            p.writeToFile(r.stop().toProfile());
+            p.writeToFile(r.stop().toProfile(leftPIDSlotIdx, rightPIDSlotIdx));
         } else {
             // Zero both encoders before recording
             leftTalon.setSelectedSensorPosition(0, 0, 0);
