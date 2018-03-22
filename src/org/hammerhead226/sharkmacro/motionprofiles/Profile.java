@@ -2,7 +2,6 @@ package org.hammerhead226.sharkmacro.motionprofiles;
 
 import java.util.Arrays;
 
-import com.ctre.CANTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -64,13 +63,17 @@ public class Profile {
 	 * @param rightTalon
 	 *            the Talon to execute the right profile with
 	 */
-	public Profile(double[][] leftProfile, double[][] rightProfile, TalonSRX leftTalon, TalonSRX rightTalon) {
+	public Profile(double[][] leftProfile, double[][] rightProfile, TalonSRX leftTalon, TalonSRX rightTalon,
+			int leftPidSlotIdx, int rightPidSlotIdx) {
 		this.leftProfile = leftProfile;
 		this.rightProfile = rightProfile;
 		this.leftTalon = leftTalon;
 		this.rightTalon = rightTalon;
 		this.length = this.leftProfile.length;
 		this.dt = (int) this.leftProfile[0][2];
+
+		handler = new ProfileHandler(new double[][][] { leftProfile, rightProfile },
+				new TalonSRX[] { leftTalon, rightTalon }, new int[] { leftPidSlotIdx, rightPidSlotIdx });
 	}
 
 	/**
@@ -87,13 +90,18 @@ public class Profile {
 	 * @param rightTalon
 	 *            the Talon to execute the right profile with
 	 */
-	public Profile(String[][] leftProfile, String[][] rightProfile, TalonSRX leftTalon, TalonSRX rightTalon) {
+	public Profile(String[][] leftProfile, String[][] rightProfile, TalonSRX leftTalon, TalonSRX rightTalon,
+			int leftPidSlotIdx, int rightPidSlotIdx) {
 		this.leftProfile = toDoubleArray(leftProfile);
 		this.rightProfile = toDoubleArray(rightProfile);
 		this.leftTalon = leftTalon;
 		this.rightTalon = rightTalon;
 		this.length = this.leftProfile.length;
 		this.dt = (int) this.leftProfile[0][2];
+
+		handler = new ProfileHandler(new double[][][] { this.leftProfile, this.rightProfile },
+				new TalonSRX[] { leftTalon, rightTalon }, new int[] { leftPidSlotIdx, rightPidSlotIdx });
+
 	}
 
 	/**
@@ -106,10 +114,8 @@ public class Profile {
 	 * @param rightGainsProfile
 	 *            the PID slot index to use to execute the right motion profile
 	 */
-	public void execute(int leftPidSlotIdx, int rightPidSlotIdx) {
+	public void execute() {
 		if (leftProfile.length != 0 && rightProfile.length != 0) {
-			handler = new ProfileHandler(new double[][][] { leftProfile, rightProfile },
-					new TalonSRX[] { leftTalon, rightTalon }, new int[] { leftPidSlotIdx, rightPidSlotIdx });
 			handler.execute();
 		} else {
 			DriverStation.getInstance();
