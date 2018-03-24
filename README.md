@@ -35,7 +35,7 @@
     ```
 * Save a profile to file
     ```java
-    Profile p = recorder.stop().toProfile(leftPIDSlotIdx, rightPIDSlotIdx);
+    Profile p = recorder.stop().toProfile();
     ProfileParser parser = new ProfileParser(filename);
     parser.writeToFile(p);
     ```

@@ -105,6 +105,22 @@ public class Profile {
 	}
 
 	/**
+	 * Constructs a new {@link Profile} object without execution Talons or PID slot
+	 * indexes. Only to be used in {@link Recording}.
+	 * 
+	 * @param leftProfile
+	 *            the left motion profile
+	 * @param rightProfile
+	 *            the right motion profile
+	 */
+	public Profile(double[][] leftProfile, double[][] rightProfile) {
+		this.leftProfile = leftProfile;
+		this.rightProfile = rightProfile;
+		this.length = this.leftProfile.length;
+		this.dt = (int) this.leftProfile[0][2];
+	}
+
+	/**
 	 * Execute a motion profile. This is done by passing {@link #leftProfile} and
 	 * {@link #rightProfile} to new {@link ProfileHandler}s and calling their
 	 * {@link ProfileHandler#execute() execute()} method.
