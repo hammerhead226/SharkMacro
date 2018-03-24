@@ -81,6 +81,7 @@ public class DriveTrain extends Subsystem {
             leftTalon.setSelectedSensorPosition(0, 0, 0);
             rightTalon.setSelectedSensorPosition(0, 0, 0);
             r.start();
+        }
     }
 }
 ```
@@ -96,7 +97,7 @@ Example command class:
 ```java
 public class ExampleCommand extends RecordableCommand {
 
-	public Drive() {
+	public ExampleCommand() {
 	}
 
 	protected void initialize() {
@@ -117,7 +118,7 @@ public class ExampleCommand extends RecordableCommand {
 	}
 
 	protected void interrupted() {
-            super.interrupted();
+        super.interrupted();
             // Your code here
 	}
 }
@@ -136,7 +137,7 @@ public class ExampleCommand extends RecordableCommand {
 * Load and play a list of actions from file
     ```java
     ActionListParser parser = new ActionListParser(filenameToLoad);
-    ActionList al = parser.toObject(leftTalon, rightTalon);
+    ActionList al = parser.toObject();
     al.execute();
     ```
 Teams can use a Command to toggle recording:
@@ -227,4 +228,4 @@ would return `profile0003`.
 
 * Be sure to have your code call `actionList.execute()` and `profile.execute()` at the same time. If not called close to simultaneously, the robot's movement and its actions will be out of sync.
 
-* Be sure to set PID gains in the talons that will be playing back your recorded profile. Not much, if any, PID tuning is required with motion profiling. I found that a P gain of between 0.5 and 1.5 on both talons and I, D and F gains of 0 worked well. (Tested on 4-CIM West Coast drivetrain with ~55 lbs. of weight on it)
+* Be sure to set PID gains in the talons that will be playing back your recorded profile. Not much, if any, PID tuning is required with motion profiling. I found that a P gain of between 0.5 and 1.5 on both talons and I, D and F gains of 0 worked well. (Tested on 4-CIM West Coast drivetrain with a total robot weight of ~100 lbs.)
