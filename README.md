@@ -7,6 +7,17 @@
 3. WPILibJ
 4. Cross The Road Electronics Phoenix Lib
 
+## Installation (for FRC Eclipse)
+
+1. Download the latest release of SharkMacro from [here](https://github.com/hammerhead226/SharkMacro/releases).
+2. Download Apache Commons Lang from [here](http://apache.spinellicreations.com//commons/lang/binaries/commons-lang3-3.7-bin.zip).
+3. Download OpenCSV from [here](https://sourceforge.net/projects/opencsv/files/latest/download).
+4. Repeat the process below for each downloaded file:
+    1. Copy the downloaded file to `C:\Users\<YourUser>\wpilib\user\java\lib`.
+    2. Right click on your robot code project in Eclipse > Build Path > Add External Archives...
+    3. Select the file just copied to `lib`.
+
+
 ## Motion profiles
 
 ### Before you start
