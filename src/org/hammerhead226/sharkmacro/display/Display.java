@@ -27,7 +27,7 @@ public class Display extends JPanel {
 		rightPosition = CSVParser.readRightPosition(fileLocation);
 
 		try {
-			image = ImageIO.read(new File("field.jpg"));
+			image = ImageIO.read(new File("frc-field.jpg"));
 		} catch (IOException e) {
 
 		}
