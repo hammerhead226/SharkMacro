@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="src/" kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/CTREWPI"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/Gayathri/wpilib/java/current/lib/cscore.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Gayathri/wpilib/java/current/lib/ntcore.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Gayathri/wpilib/java/current/lib/opencv.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Gayathri/wpilib/java/current/lib/WPILib.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Gayathri/wpilib/java/current/lib/wpiutil.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Gayathri/wpilib/user/java/lib/commons-lang3-3.7.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Gayathri/wpilib/user/java/lib/CTRE_Phoenix.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Gayathri/wpilib/user/java/lib/CTRE_Phoenix-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Gayathri/wpilib/user/java/lib/HammerheadLib-v1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Gayathri/wpilib/user/java/lib/navx_frc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Gayathri/wpilib/user/java/lib/opencsv-4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
