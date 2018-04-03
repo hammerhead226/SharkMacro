@@ -16,15 +16,18 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Display extends JPanel {
-	private static final long serialVersionUID = 1L;
-	private static BufferedImage image;
-	private static ArrayList<Integer> leftPosition;
-	private static ArrayList<Integer> rightPosition;
+	private final long serialVersionUID = 1L;
+	private BufferedImage image;
+	private ArrayList<Integer> leftPosition;
+	private ArrayList<Integer> rightPosition;
+	private String fileLocation;
 
 	public Display(String fileLocation) {
 
 		leftPosition = CSVParser.readLeftPosition(fileLocation);
 		rightPosition = CSVParser.readRightPosition(fileLocation);
+		
+		this.fileLocation = fileLocation;
 
 		try {
 			image = ImageIO.read(new File("frc-field.jpg"));
@@ -41,7 +44,7 @@ public class Display extends JPanel {
 		g.setFont(new Font("Arial", Font.PLAIN, 14));
 	}
 
-	public static void drawFrame(String fileLocation) {
+	public void drawFrame() {
 
 		JFrame frame = new JFrame();
 		Display panel = new Display(fileLocation);
@@ -54,5 +57,10 @@ public class Display extends JPanel {
 			}
 		});
 
+	}
+	
+	public void getPosition() {
+		System.out.println(leftPosition);
+		System.out.println(rightPosition);
 	}
 }

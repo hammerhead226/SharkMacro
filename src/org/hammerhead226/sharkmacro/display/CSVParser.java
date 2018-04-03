@@ -12,6 +12,7 @@ public class CSVParser {
 		ArrayList<Double> temp = new ArrayList<Double>(45000);
 		String InputLine;
 		Scanner scanner = null;
+		String tempString;
 
 		try {
 			scanner = new Scanner(new BufferedReader(new FileReader(fileLocation)));
@@ -19,9 +20,9 @@ public class CSVParser {
 			while (scanner.hasNextLine()) {
 				InputLine = scanner.nextLine();
 				String[] InArray = InputLine.split(",");
-
 				for (int i = 0; i < InArray.length; i++) {
-					temp.add(Double.parseDouble(InArray[i]));
+					tempString = InArray[i].replaceAll("\"", "");
+					temp.add(Double.parseDouble(tempString));
 				}
 
 			}
@@ -48,7 +49,7 @@ public class CSVParser {
 		ArrayList<Integer> position = new ArrayList<Integer>();
 
 		for (int i = 0; i < (profile.size() / 5); i++) {
-			position.add(profile.get(5 * i + 1).intValue());
+			position.add(profile.get(5 * i + 2).intValue());
 		}
 		
 		return position;
