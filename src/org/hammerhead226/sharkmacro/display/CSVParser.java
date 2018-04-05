@@ -33,23 +33,23 @@ public class CSVParser {
 		return temp;
 	}
 
-	public static ArrayList<Integer> readLeftPosition(String fileLocation) {
+	public static ArrayList<Double> readLeftPosition(String fileLocation) {
 		ArrayList<Double> profile = loadProfile(fileLocation);
-		ArrayList<Integer> position = new ArrayList<Integer>();
+		ArrayList<Double> position = new ArrayList<Double>();
 
 		for (int i = 0; i < (profile.size() / 5); i++) {
-			position.add(profile.get(5 * i).intValue());
+			position.add( profile.get(5 * i));
 		}
 		
 		return position;
 	}
 
-	public static ArrayList<Integer> readRightPosition(String fileLocation) {
+	public static ArrayList<Double> readRightPosition(String fileLocation) {
 		ArrayList<Double> profile = loadProfile(fileLocation);
-		ArrayList<Integer> position = new ArrayList<Integer>();
+		ArrayList<Double> position = new ArrayList<Double>();
 
 		for (int i = 0; i < (profile.size() / 5); i++) {
-			position.add(profile.get(5 * i + 2).intValue());
+			position.add(profile.get(5 * i + 2));
 		}
 		
 		return position;
