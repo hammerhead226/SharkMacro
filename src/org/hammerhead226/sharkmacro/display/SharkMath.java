@@ -29,13 +29,17 @@ public class SharkMath {
 		return theta_1 + theta_2;
 	}
 
+	private double adjustedMag(double p) {
+		return p * 0.87;
+	}
+
 	private ArrayList<Point> calcCoords(Point left, Point right, double left_p, double right_p) {
 		double heading = calcHeading(left, right, left_p, right_p);
 
-		Point leftCoords = new Point((int) (left_p * Math.cos(heading) + left.x),
-				(int) (left_p * Math.sin(heading) + left.y));
-		Point rightCoords = new Point((int) (right_p * Math.cos(heading) + right.x),
-				(int) (right_p * Math.sin(heading) + right.y));
+		Point leftCoords = new Point((int) (1.001 * (adjustedMag(left_p) * Math.cos(heading) + left.x) ),
+				(int) ((adjustedMag(left_p) * Math.sin(heading) + left.y)));
+		Point rightCoords = new Point((int) (1.001 * (adjustedMag(right_p) * Math.cos(heading) + right.x)),
+				(int) ((adjustedMag(right_p) * Math.sin(heading) + right.y)));
 
 		ArrayList<Point> temp = new ArrayList<Point>(2);
 		temp.add(leftCoords);
@@ -44,7 +48,7 @@ public class SharkMath {
 		return temp;
 	}
 
-	public ArrayList<ArrayList<Point>> temp() {
+	public ArrayList<ArrayList<Point>> createCoordList() {
 		ArrayList<Point> tempRight = new ArrayList<Point>(rightPosition.size());
 		ArrayList<Point> tempLeft = new ArrayList<Point>(leftPosition.size());
 		tempRight.add(rightStart);

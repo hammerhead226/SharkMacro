@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -19,14 +21,40 @@ import javax.swing.JPanel;
 public class Display extends JPanel {
 	private final long serialVersionUID = 1L;
 	private BufferedImage image;
+	ArrayList<Double> rightPosition;
+	ArrayList<Double> leftPosition;
 	ArrayList<Point> rightCoords;
 	ArrayList<Point> leftCoords;
-	private String fileLocation;
+	String fileLocation;
+	SharkMath math;
 
-	public Display(ArrayList<Point> rightCoords, ArrayList<Point> leftCoords) {
+	public Display(String fileLocation) {
 
-		this.rightCoords = rightCoords;
-		this.leftCoords = leftCoords;
+		this.fileLocation = fileLocation;
+		rightPosition = CSVParser.readRightPosition(fileLocation);
+		leftPosition = CSVParser.readLeftPosition(fileLocation);
+
+		for (int i = 0; i < rightPosition.size() && i < leftPosition.size(); i++) {
+			rightPosition.set(i, rightPosition.get(i) * 6.15 * Math.PI / 4096 * 6);
+			leftPosition.set(i, leftPosition.get(i) * 6.15 * Math.PI / 4096 * 6);
+		}
+
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				math = new SharkMath(
+						new Point(e.getX(), e.getY() + 65),
+						new Point(e.getX(), e.getY() - 65),
+						rightPosition, leftPosition, 100);
+
+				rightCoords = math.createCoordList().get(1);
+				leftCoords = math.createCoordList().get(0);
+
+				System.out.println(rightCoords);
+				System.out.println(leftCoords);
+				repaint();
+			}
+		});
 
 		try {
 			image = ImageIO.read(new File("field.jpg"));
@@ -38,18 +66,22 @@ public class Display extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		//g.drawImage(image, 0, 0, this);
+		// g.drawImage(image, -2000, -300, this);
 		Graphics2D g2 = (Graphics2D) g;
 		g.setFont(new Font("Arial", Font.PLAIN, 14));
-		Draw.drawPath(g2, rightCoords, leftCoords);
+		System.out.println("repainted");
+		if (math != null) {
+			Draw.drawPath(g2, rightCoords, leftCoords);
+		}
 	}
 
 	public void drawFrame() {
 
 		JFrame frame = new JFrame();
-		Display panel = new Display(rightCoords, leftCoords);
+		Display panel = new Display(fileLocation);
 		frame.add(panel);
-		frame.setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height);
+		frame.setSize(Toolkit.getDefaultToolkit().getScreenSize().width,
+				Toolkit.getDefaultToolkit().getScreenSize().height);
 		frame.setVisible(true);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -58,4 +90,5 @@ public class Display extends JPanel {
 		});
 
 	}
+
 }
