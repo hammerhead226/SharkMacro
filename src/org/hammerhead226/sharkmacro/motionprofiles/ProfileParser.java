@@ -66,11 +66,12 @@ public final class ProfileParser extends Parser {
 	 */
 	public Profile toObject(TalonSRX leftTalon, TalonSRX rightTalon, int leftPidSlotIdx, int rightPidSlotIdx) {
 		List<String[]> profileRaw = readFromFile();
-		
+
 		if (profileRaw == null) {
 			DriverStation.getInstance();
 			DriverStation.reportError("Tried to load nonexistant Profile from name: " + super.filename, false);
-			return new Profile(new double[0][0], new double[0][0], leftTalon, rightTalon, leftPidSlotIdx, rightPidSlotIdx);
+			return new Profile(new double[0][0], new double[0][0], leftTalon, rightTalon, leftPidSlotIdx,
+					rightPidSlotIdx);
 		}
 
 		// Process read values into Profile
@@ -90,6 +91,16 @@ public final class ProfileParser extends Parser {
 		Profile p = new Profile(left, right, leftTalon, rightTalon, leftPidSlotIdx, rightPidSlotIdx);
 
 		return p;
+	}
+	
+	/**
+	 * Cache a saved profile.
+	 * 
+	 * @param filename
+	 *            the name of the profile to cache
+	 */
+	public static void cache(String filename) {
+		Parser.cache(Constants.PROFILE_STORAGE_DIRECTORY, filename);
 	}
 
 	/**

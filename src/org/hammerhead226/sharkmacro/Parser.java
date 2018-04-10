@@ -67,10 +67,7 @@ public abstract class Parser {
 		this.directory = directory;
 		this.prefix = prefix;
 
-		if (!filename.endsWith(".csv")) {
-			filename += ".csv";
-		}
-		this.filename = directory + "/" + filename;
+		this.filename = format(directory, filename);
 	}
 
 	/**
@@ -104,7 +101,7 @@ public abstract class Parser {
 	 * {@link java.util.List List} with each String array containing the values in
 	 * each row of the file.
 	 * 
-	 * @return a list representing the contents of the read file
+	 * @return a list containing the contents of the read file
 	 */
 	protected List<String[]> readFromFile() {
 		if (cache.containsKey(filename)) {
@@ -114,7 +111,13 @@ public abstract class Parser {
 		return cache();
 	}
 
-	public static void cache(String filename) {
+	/**
+	 * Add a file to the cache.
+	 * 
+	 * @param filename
+	 *            the file to cache
+	 */
+	protected static void cache(String directory, String filename) {
 		if (cache.containsKey(filename)) {
 			DriverStation.getInstance();
 			DriverStation.reportWarning("Tried to cache an already cached file!", false);
@@ -124,7 +127,12 @@ public abstract class Parser {
 		cache.put(filename, parseCSV(filename));
 	}
 
-	public List<String[]> cache() {
+	/**
+	 * Add the file at this instance's passed filename to the cache.
+	 * 
+	 * @return the parsed CSV in list form
+	 */
+	protected List<String[]> cache() {
 		if (cache.containsKey(filename)) {
 			DriverStation.getInstance();
 			DriverStation.reportWarning("Tried to cache an already cached file!", false);
@@ -134,6 +142,13 @@ public abstract class Parser {
 		return cache.put(filename, parseCSV(filename));
 	}
 
+	/**
+	 * Parse the given CSV file into a list of its lines.
+	 * 
+	 * @param filename
+	 *            CSV to parse
+	 * @return parsed CSV in list form
+	 */
 	private static List<String[]> parseCSV(String filename) {
 		CSVReader reader;
 		List<String[]> rawFile = new ArrayList<String[]>(0);
@@ -260,6 +275,14 @@ public abstract class Parser {
 			}
 		}
 		return true;
+	}
+
+	private static String format(String directory, String filename) {
+		if (!filename.endsWith(".csv")) {
+			filename += ".csv";
+		}
+		filename = directory + "/" + filename;
+		return filename;
 	}
 
 }

@@ -7,6 +7,8 @@ import org.hammerhead226.sharkmacro.Constants;
 import org.hammerhead226.sharkmacro.Parser;
 import org.hammerhead226.sharkmacro.motionprofiles.Profile;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+
 import edu.wpi.first.wpilibj.DriverStation;
 
 /**
@@ -68,7 +70,7 @@ public class ActionListParser extends Parser {
 	public ActionList toObject() {
 
 		List<String[]> actionListRaw = readFromFile();
-		
+
 		if (actionListRaw == null) {
 			DriverStation.getInstance();
 			DriverStation.reportError("Tried to load nonexistant ActionList from name: " + super.filename, false);
@@ -83,6 +85,16 @@ public class ActionListParser extends Parser {
 		ActionList al = new ActionList(list);
 
 		return al;
+	}
+
+	/**
+	 * Cache a saved actionlist.
+	 * 
+	 * @param filename
+	 *            the name of the actionlist to cache
+	 */
+	public static void cache(String filename) {
+		Parser.cache(Constants.ACTIONLIST_STORAGE_DIRECTORY, filename);
 	}
 
 	/**
