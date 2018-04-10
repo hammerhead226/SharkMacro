@@ -15,6 +15,8 @@ import java.util.List;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 /**
  * Class to read and write csv files. This class is extended by two classes,
  * {@link org.hammerhead226.sharkmacro.actions.ActionListParser
@@ -45,7 +47,7 @@ public abstract class Parser {
 	protected final String filename;
 
 	/**
-	 * HashMap object representing a cache of all previously loaded
+	 * HashMap object representing a cache of all previously loaded or cached
 	 * {@link org.hammerhead226.sharkmacro.motionprofiles.Profile Profiles} and
 	 * {@link org.hammerhead226.sharkmacro.actions.ActionList ActionLists}.
 	 */
@@ -82,7 +84,7 @@ public abstract class Parser {
 	 */
 	protected boolean writeToFile(ArrayList<String[]> data) {
 		touchDirectory(directory);
-		
+
 		CSVWriter writer;
 		try {
 			writer = new CSVWriter(new FileWriter(filename), Constants.SEPARATOR, Constants.QUOTECHAR,
@@ -109,6 +111,38 @@ public abstract class Parser {
 			return cache.get(filename);
 		}
 
+		List<String[]> rawFile = parseCSV(filename);
+
+		cache.put(filename, rawFile);
+
+		return rawFile;
+	}
+
+	public static void cache(String filename) {
+		if (cache.containsKey(filename)) {
+			DriverStation.getInstance();
+			DriverStation.reportWarning("Tried to cache an already cached file!", false);
+			return;
+		}
+
+		List<String[]> rawFile = parseCSV(filename);
+
+		cache.put(filename, rawFile);
+	}
+
+	public void cache() {
+		if (cache.containsKey(filename)) {
+			DriverStation.getInstance();
+			DriverStation.reportWarning("Tried to cache an already cached file!", false);
+			return;
+		}
+
+		List<String[]> rawFile = parseCSV(filename);
+
+		cache.put(filename, rawFile);
+	}
+
+	private static List<String[]> parseCSV(String filename) {
 		CSVReader reader;
 		List<String[]> rawFile = new ArrayList<String[]>(0);
 		try {
@@ -122,8 +156,6 @@ public abstract class Parser {
 			e.printStackTrace();
 			return null;
 		}
-
-		cache.put(filename, rawFile);
 
 		return rawFile;
 	}
