@@ -111,11 +111,7 @@ public abstract class Parser {
 			return cache.get(filename);
 		}
 
-		List<String[]> rawFile = parseCSV(filename);
-
-		cache.put(filename, rawFile);
-
-		return rawFile;
+		return cache();
 	}
 
 	public static void cache(String filename) {
@@ -125,21 +121,17 @@ public abstract class Parser {
 			return;
 		}
 
-		List<String[]> rawFile = parseCSV(filename);
-
-		cache.put(filename, rawFile);
+		cache.put(filename, parseCSV(filename));
 	}
 
-	public void cache() {
+	public List<String[]> cache() {
 		if (cache.containsKey(filename)) {
 			DriverStation.getInstance();
 			DriverStation.reportWarning("Tried to cache an already cached file!", false);
-			return;
+			return cache.get(filename);
 		}
 
-		List<String[]> rawFile = parseCSV(filename);
-
-		cache.put(filename, rawFile);
+		return cache.put(filename, parseCSV(filename));
 	}
 
 	private static List<String[]> parseCSV(String filename) {
