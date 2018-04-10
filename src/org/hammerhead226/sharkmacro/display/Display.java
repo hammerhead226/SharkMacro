@@ -7,6 +7,7 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -19,12 +20,14 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Display extends JPanel {
-	private final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
+	private static int height = Toolkit.getDefaultToolkit().getScreenSize().height;
 	private BufferedImage image;
 	ArrayList<Double> rightPosition;
 	ArrayList<Double> leftPosition;
 	ArrayList<Point> rightCoords;
 	ArrayList<Point> leftCoords;
+	boolean clickFlag = false;
 	String fileLocation;
 	SharkMath math;
 
@@ -39,20 +42,36 @@ public class Display extends JPanel {
 			leftPosition.set(i, leftPosition.get(i) * 6.15 * Math.PI / 4096 * 6);
 		}
 
+		addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				if (!clickFlag) {
+					math = new SharkMath(new Point(height - e.getY(), (e.getX() + 65)), new Point(height - e.getY(), (e.getX() - 65)),
+							rightPosition, leftPosition, 100, 0.97);
+
+					rightCoords = math.createCoordList().get(1);
+					leftCoords = math.createCoordList().get(0);
+
+					repaint();
+				}
+			}
+		});
+		
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				math = new SharkMath(
-						new Point(e.getX(), e.getY() + 65),
-						new Point(e.getX(), e.getY() - 65),
-						rightPosition, leftPosition, 100);
+				if(!clickFlag) {
+				clickFlag = true;
+				} else {
+					clickFlag = false;
+					math = new SharkMath(new Point(e.getY(), (e.getX() + 65)), new Point(e.getY(), (e.getX() - 65)),
+							rightPosition, leftPosition, 100, 0.97);
 
-				rightCoords = math.createCoordList().get(1);
-				leftCoords = math.createCoordList().get(0);
+					rightCoords = math.createCoordList().get(1);
+					leftCoords = math.createCoordList().get(0);
 
-				System.out.println(rightCoords);
-				System.out.println(leftCoords);
-				repaint();
+					repaint();
+				}
 			}
 		});
 
@@ -66,10 +85,9 @@ public class Display extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		// g.drawImage(image, -2000, -300, this);
+		g.drawImage(image, 0, -1800, this);
 		Graphics2D g2 = (Graphics2D) g;
 		g.setFont(new Font("Arial", Font.PLAIN, 14));
-		System.out.println("repainted");
 		if (math != null) {
 			Draw.drawPath(g2, rightCoords, leftCoords);
 		}
