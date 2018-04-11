@@ -176,6 +176,18 @@ public abstract class Parser {
 
 		return rawFile;
 	}
+	
+	/**
+	 * @return a set of the keys in the cache
+	 */
+	public static String[] getCacheKeys() {
+		Object[] keys = cache.keySet().toArray();
+		String[] arr = new String[keys.length];
+		for (int i = 0; i < arr.length; i++) {
+			arr[i] = keys[i].toString();
+		}
+		return arr;
+	}
 
 	/**
 	 * This method generates a new filename to be used for saving a new file. For
