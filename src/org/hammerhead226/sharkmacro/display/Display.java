@@ -22,6 +22,7 @@ import javax.swing.JPanel;
 public class Display extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static int height = Toolkit.getDefaultToolkit().getScreenSize().height;
+	private static int width = Toolkit.getDefaultToolkit().getScreenSize().width;
 	private BufferedImage image;
 	ArrayList<Double> rightPosition;
 	ArrayList<Double> leftPosition;
@@ -38,16 +39,16 @@ public class Display extends JPanel {
 		leftPosition = CSVParser.readLeftPosition(fileLocation);
 
 		for (int i = 0; i < rightPosition.size() && i < leftPosition.size(); i++) {
-			rightPosition.set(i, rightPosition.get(i) * 6.15 * Math.PI / 4096 * 6);
-			leftPosition.set(i, leftPosition.get(i) * 6.15 * Math.PI / 4096 * 6);
+			rightPosition.set(i, rightPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
+			leftPosition.set(i, leftPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
 		}
 
 		addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				if (!clickFlag) {
-					math = new SharkMath(new Point(height - e.getY(), (e.getX() + 65)), new Point(height - e.getY(), (e.getX() - 65)),
-							rightPosition, leftPosition, 100, 0.97);
+					math = new SharkMath(new Point(height - e.getY(), width - (e.getX() - 65)), new Point(height - e.getY(), width - (e.getX() + 65)),
+							rightPosition, leftPosition, 130, 0.97);
 
 					rightCoords = math.createCoordList().get(1);
 					leftCoords = math.createCoordList().get(0);
@@ -64,7 +65,7 @@ public class Display extends JPanel {
 				clickFlag = true;
 				} else {
 					clickFlag = false;
-					math = new SharkMath(new Point(e.getY(), (e.getX() + 65)), new Point(e.getY(), (e.getX() - 65)),
+					math = new SharkMath(new Point(e.getY(), width - (e.getX() - 65)), new Point(e.getY(), width - (e.getX() + 65)),
 							rightPosition, leftPosition, 100, 0.97);
 
 					rightCoords = math.createCoordList().get(1);
@@ -85,7 +86,7 @@ public class Display extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.drawImage(image, 0, -1800, this);
+		g.drawImage(image, -100, -1800, this);
 		Graphics2D g2 = (Graphics2D) g;
 		g.setFont(new Font("Arial", Font.PLAIN, 14));
 		if (math != null) {

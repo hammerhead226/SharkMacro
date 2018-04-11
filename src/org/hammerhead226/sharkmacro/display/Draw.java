@@ -13,15 +13,16 @@ public class Draw {
 		int j = 0;
 		
 		int height = Toolkit.getDefaultToolkit().getScreenSize().height;
+		int width = Toolkit.getDefaultToolkit().getScreenSize().width;
 
 		for (int i = 0; i < right.size() - 1; i++) {
 
 			g.setColor(Color.RED);
-			g.fillOval(right.get(i).y / 120, height - right.get(i).x / 120, 2, 2);
-			g.drawLine((right.get(i).y - 1) / 120, height - ((right.get(i).x - 1) / 120), (right.get(i + 1).y - 1) / 120, height - ((right.get(i + 1).x - 1) / 120));
+			g.fillOval(width - (right.get(i).y / 120), height - right.get(i).x / 120, 2, 2);
+			g.drawLine(width - ((right.get(i).y - 1) / 120), height - ((right.get(i).x - 1) / 120), width - ((right.get(i + 1).y - 1) / 120), height - ((right.get(i + 1).x - 1) / 120));
 			g.setColor(Color.BLUE);
-			g.fillOval(left.get(i).y / 120, height - left.get(i).x / 120, 2, 2);
-			g.drawLine((left.get(i).y - 1) / 120, height - ((left.get(i).x - 1) / 120), (left.get(i + 1).y - 1) / 120, height - ((left.get(i + 1).x - 1) / 120));
+			g.fillOval(width - (left.get(i).y / 120), height - left.get(i).x / 120, 2, 2);
+			g.drawLine(width - ((left.get(i).y - 1) / 120), height - ((left.get(i).x - 1) / 120), width - ((left.get(i + 1).y - 1) / 120), height - ((left.get(i + 1).x - 1) / 120));
 
 		}
 	}
