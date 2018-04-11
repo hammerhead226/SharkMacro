@@ -117,14 +117,18 @@ public abstract class Parser {
 	 * @param filename
 	 *            the file to cache
 	 */
-	protected static void cache(String directory, String filename) {
+	protected static List<String[]> cache(String directory, String filename) {
 		if (cache.containsKey(filename)) {
 			DriverStation.getInstance();
 			DriverStation.reportWarning("Tried to cache an already cached file!", false);
-			return;
+			return cache.get(filename);
 		}
+		
+		List<String[]> rawFile = parseCSV(filename);
+		
+		cache.put(filename, rawFile);
 
-		cache.put(filename, parseCSV(filename));
+		return rawFile;
 	}
 
 	/**
@@ -139,7 +143,11 @@ public abstract class Parser {
 			return cache.get(filename);
 		}
 
-		return cache.put(filename, parseCSV(filename));
+		List<String[]> rawFile = parseCSV(filename);
+		
+		cache.put(filename, rawFile);
+		
+		return rawFile;
 	}
 
 	/**
