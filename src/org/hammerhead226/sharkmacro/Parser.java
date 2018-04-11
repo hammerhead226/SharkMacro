@@ -277,6 +277,16 @@ public abstract class Parser {
 		return true;
 	}
 
+	/**
+	 * Formats the given strings into an absolute file path that conforms to
+	 * SharkMacro's standard.
+	 * 
+	 * @param directory
+	 *            directory to format the complete filename with
+	 * @param filename
+	 *            filename to format the complete filename with
+	 * @return correctly formatted absoulte file path
+	 */
 	private static String format(String directory, String filename) {
 		if (!filename.endsWith(".csv")) {
 			filename += ".csv";
