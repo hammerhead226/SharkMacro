@@ -5,9 +5,6 @@ import java.util.List;
 
 import org.hammerhead226.sharkmacro.Constants;
 import org.hammerhead226.sharkmacro.Parser;
-import org.hammerhead226.sharkmacro.motionprofiles.Profile;
-
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
