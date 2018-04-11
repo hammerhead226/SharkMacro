@@ -114,6 +114,8 @@ public abstract class Parser {
 	/**
 	 * Add a file to the cache.
 	 * 
+	 * @param directory
+	 *            the directory of the file to be cached
 	 * @param filename
 	 *            the file to cache
 	 */
