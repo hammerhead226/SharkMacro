@@ -15,6 +15,8 @@ import java.util.List;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 /**
  * Class to read and write csv files. This class is extended by two classes,
  * {@link org.hammerhead226.sharkmacro.actions.ActionListParser
@@ -45,7 +47,7 @@ public abstract class Parser {
 	protected final String filename;
 
 	/**
-	 * HashMap object representing a cache of all previously loaded
+	 * HashMap object representing a cache of all previously loaded or cached
 	 * {@link org.hammerhead226.sharkmacro.motionprofiles.Profile Profiles} and
 	 * {@link org.hammerhead226.sharkmacro.actions.ActionList ActionLists}.
 	 */
@@ -65,10 +67,7 @@ public abstract class Parser {
 		this.directory = directory;
 		this.prefix = prefix;
 
-		if (!filename.endsWith(".csv")) {
-			filename += ".csv";
-		}
-		this.filename = directory + "/" + filename;
+		this.filename = format(directory, filename);
 	}
 
 	/**
@@ -82,7 +81,7 @@ public abstract class Parser {
 	 */
 	protected boolean writeToFile(ArrayList<String[]> data) {
 		touchDirectory(directory);
-		
+
 		CSVWriter writer;
 		try {
 			writer = new CSVWriter(new FileWriter(filename), Constants.SEPARATOR, Constants.QUOTECHAR,
@@ -102,13 +101,65 @@ public abstract class Parser {
 	 * {@link java.util.List List} with each String array containing the values in
 	 * each row of the file.
 	 * 
-	 * @return a list representing the contents of the read file
+	 * @return a list containing the contents of the read file
 	 */
 	protected List<String[]> readFromFile() {
 		if (cache.containsKey(filename)) {
 			return cache.get(filename);
 		}
 
+		return cache();
+	}
+
+	/**
+	 * Add a file to the cache.
+	 * 
+	 * @param directory
+	 *            the directory of the file to be cached
+	 * @param filename
+	 *            the file to cache
+	 */
+	protected static List<String[]> cache(String directory, String filename) {
+		if (cache.containsKey(filename)) {
+			DriverStation.getInstance();
+			DriverStation.reportWarning("Tried to cache an already cached file!", false);
+			return cache.get(filename);
+		}
+		
+		List<String[]> rawFile = parseCSV(filename);
+		
+		cache.put(filename, rawFile);
+
+		return rawFile;
+	}
+
+	/**
+	 * Add the file at this instance's passed filename to the cache.
+	 * 
+	 * @return the parsed CSV in list form
+	 */
+	protected List<String[]> cache() {
+		if (cache.containsKey(filename)) {
+			DriverStation.getInstance();
+			DriverStation.reportWarning("Tried to cache an already cached file!", false);
+			return cache.get(filename);
+		}
+
+		List<String[]> rawFile = parseCSV(filename);
+		
+		cache.put(filename, rawFile);
+		
+		return rawFile;
+	}
+
+	/**
+	 * Parse the given CSV file into a list of its lines.
+	 * 
+	 * @param filename
+	 *            CSV to parse
+	 * @return parsed CSV in list form
+	 */
+	private static List<String[]> parseCSV(String filename) {
 		CSVReader reader;
 		List<String[]> rawFile = new ArrayList<String[]>(0);
 		try {
@@ -123,9 +174,19 @@ public abstract class Parser {
 			return null;
 		}
 
-		cache.put(filename, rawFile);
-
 		return rawFile;
+	}
+	
+	/**
+	 * @return a set of the keys in the cache
+	 */
+	public static String[] getCacheKeys() {
+		Object[] keys = cache.keySet().toArray();
+		String[] arr = new String[keys.length];
+		for (int i = 0; i < arr.length; i++) {
+			arr[i] = keys[i].toString();
+		}
+		return arr;
 	}
 
 	/**
@@ -236,6 +297,24 @@ public abstract class Parser {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Formats the given strings into an absolute file path that conforms to
+	 * SharkMacro's standard.
+	 * 
+	 * @param directory
+	 *            directory to format the complete filename with
+	 * @param filename
+	 *            filename to format the complete filename with
+	 * @return correctly formatted absoulte file path
+	 */
+	private static String format(String directory, String filename) {
+		if (!filename.endsWith(".csv")) {
+			filename += ".csv";
+		}
+		filename = directory + "/" + filename;
+		return filename;
 	}
 
 }
