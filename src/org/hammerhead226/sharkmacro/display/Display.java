@@ -29,14 +29,16 @@ public class Display extends JPanel {
 	ArrayList<Point> rightCoords;
 	ArrayList<Point> leftCoords;
 	boolean clickFlag = false;
-	String fileLocation;
+	String macroLocation;
+	String imageLocation;
 	SharkMath math;
 
-	public Display(String fileLocation) {
+	public Display(String macroLocation, String imageLocation) {
 
-		this.fileLocation = fileLocation;
-		rightPosition = CSVParser.readRightPosition(fileLocation);
-		leftPosition = CSVParser.readLeftPosition(fileLocation);
+		this.macroLocation = macroLocation;
+		this.imageLocation = imageLocation;
+		rightPosition = CSVParser.readRightPosition(macroLocation);
+		leftPosition = CSVParser.readLeftPosition(macroLocation);
 
 		for (int i = 0; i < rightPosition.size() && i < leftPosition.size(); i++) {
 			rightPosition.set(i, rightPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
@@ -77,7 +79,7 @@ public class Display extends JPanel {
 		});
 
 		try {
-			image = ImageIO.read(new File("field.jpg"));
+			image = ImageIO.read(new File(imageLocation));
 		} catch (IOException e) {
 
 		}
@@ -97,7 +99,7 @@ public class Display extends JPanel {
 	public void drawFrame() {
 
 		JFrame frame = new JFrame();
-		Display panel = new Display(fileLocation);
+		Display panel = new Display(macroLocation, imageLocation);
 		frame.add(panel);
 		frame.setSize(Toolkit.getDefaultToolkit().getScreenSize().width,
 				Toolkit.getDefaultToolkit().getScreenSize().height);
