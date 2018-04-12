@@ -3,8 +3,12 @@ package org.hammerhead226.sharkmacro.display;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.Robot;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -16,14 +20,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
-public class Display extends JPanel {
+public class Display extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private static int height = Toolkit.getDefaultToolkit().getScreenSize().height;
 	private static int width = Toolkit.getDefaultToolkit().getScreenSize().width;
 	private BufferedImage image;
+	private static JButton drawPath;
 	ArrayList<Double> rightPosition;
 	ArrayList<Double> leftPosition;
 	ArrayList<Point> rightCoords;
@@ -32,8 +39,18 @@ public class Display extends JPanel {
 	String macroLocation;
 	String imageLocation;
 	SharkMath math;
+	boolean pathFlag = false;
+	int pathCounter = 0;
+	JFrame frame;
+	Display panel;
+	Graphics2D g2;
 
 	public Display(String macroLocation, String imageLocation) {
+
+		drawPath = new JButton("Show Path");
+		drawPath.setActionCommand("show path");
+		drawPath.addActionListener(this);
+		drawPath.setVisible(false);
 
 		this.macroLocation = macroLocation;
 		this.imageLocation = imageLocation;
@@ -46,11 +63,14 @@ public class Display extends JPanel {
 		}
 
 		addMouseMotionListener(new MouseMotionAdapter() {
+
 			@Override
 			public void mouseMoved(MouseEvent e) {
+				repaint();
 				if (!clickFlag) {
-					math = new SharkMath(new Point(height - e.getY(), width - (e.getX() - 65)), new Point(height - e.getY(), width - (e.getX() + 65)),
-							rightPosition, leftPosition, 130, 0.97);
+					math = new SharkMath(new Point(height - e.getY(), width - (e.getX() - 65)),
+							new Point(height - e.getY(), width - (e.getX() + 65)), rightPosition, leftPosition, 130,
+							0.97);
 
 					rightCoords = math.createCoordList().get(1);
 					leftCoords = math.createCoordList().get(0);
@@ -59,21 +79,24 @@ public class Display extends JPanel {
 				}
 			}
 		});
-		
+
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if(!clickFlag) {
-				clickFlag = true;
+				if (!clickFlag) {
+					clickFlag = true;
+					drawPath.setVisible(true);
+
 				} else {
+					drawPath.setVisible(false);
 					clickFlag = false;
-					math = new SharkMath(new Point(e.getY(), width - (e.getX() - 65)), new Point(e.getY(), width - (e.getX() + 65)),
-							rightPosition, leftPosition, 100, 0.97);
+					math = new SharkMath(new Point(e.getY(), width - (e.getX() - 65)),
+							new Point(e.getY(), width - (e.getX() + 65)), rightPosition, leftPosition, 100, 0.97);
 
 					rightCoords = math.createCoordList().get(1);
 					leftCoords = math.createCoordList().get(0);
 
-					repaint();
+					clickFlag = false;
 				}
 			}
 		});
@@ -89,27 +112,81 @@ public class Display extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g.drawImage(image, -100, -1800, this);
-		Graphics2D g2 = (Graphics2D) g;
+		g2 = (Graphics2D) g;
 		g.setFont(new Font("Arial", Font.PLAIN, 14));
 		if (math != null) {
 			Draw.drawPath(g2, rightCoords, leftCoords);
+			if (pathFlag) {
+				if (pathCounter < rightCoords.size()) {
+					Draw.drawRobot(g2, rightCoords, leftCoords, pathCounter);
+				}
+			}
 		}
 	}
 
 	public void drawFrame() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				frame = new JFrame();
+				panel = new Display(macroLocation, imageLocation);
+				panel.add(drawPath);
+				frame.add(panel);
+				frame.setSize(Toolkit.getDefaultToolkit().getScreenSize().width + 100,
+						Toolkit.getDefaultToolkit().getScreenSize().height + 100);
+				frame.setVisible(true);
+				frame.addWindowListener(new WindowAdapter() {
+					public void windowClosing(WindowEvent e) {
+						System.exit(0);
+					}
+				});
 
-		JFrame frame = new JFrame();
-		Display panel = new Display(macroLocation, imageLocation);
-		frame.add(panel);
-		frame.setSize(Toolkit.getDefaultToolkit().getScreenSize().width,
-				Toolkit.getDefaultToolkit().getScreenSize().height);
-		frame.setVisible(true);
-		frame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				System.exit(0);
 			}
 		});
 
 	}
 
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
+		if ("show path".equals(e.getActionCommand())) {
+
+			
+
+			new Thread() {
+
+				public void run() {
+					pathFlag = true;
+
+					for (int i = 0; i < rightCoords.size(); i++) {
+						int j = i;
+						panel = new Display(macroLocation, imageLocation);
+						pathCounter = j;
+						System.out.println(pathCounter);
+						System.out.println(String.valueOf(MouseInfo.getPointerInfo().getLocation()));
+						try {
+							Robot bot = new Robot();
+							if(i < 2) {
+								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x + 10000, MouseInfo.getPointerInfo().getLocation().y);
+							}
+							if(i % 2 == 0 ) {
+								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x, MouseInfo.getPointerInfo().getLocation().y + 1);
+							} else {
+								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x, MouseInfo.getPointerInfo().getLocation().y - 1);
+							}
+						} catch (Exception k) {
+						}
+						panel.repaint();
+
+						try {
+							Thread.sleep(1 	);
+						} catch (Exception k) {
+						}
+					}
+
+				}
+			}.start();
+		}
+
+	}
 }
