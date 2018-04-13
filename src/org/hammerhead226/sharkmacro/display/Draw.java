@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Draw {
@@ -29,9 +32,12 @@ public class Draw {
 		}
 	}
 
-	public static void drawRobot(Graphics2D g, ArrayList<Point> right, ArrayList<Point> left, int point) {
+	public static void drawRobot(Graphics2D g, ArrayList<Point> right, ArrayList<Point> left, BufferedImage robot,
+			int point) {
+
 		g.setColor(Color.BLACK);
 		g.drawLine(width - (left.get(point).y / 120), height - (left.get(point).x / 120),
 				width - (right.get(point).y / 120), height - (right.get(point).x / 120));
+
 	}
 }

@@ -29,7 +29,8 @@ public class Display extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private static int height = Toolkit.getDefaultToolkit().getScreenSize().height;
 	private static int width = Toolkit.getDefaultToolkit().getScreenSize().width;
-	private BufferedImage image;
+	private BufferedImage background;
+	private BufferedImage robot;
 	private static JButton drawPath;
 	ArrayList<Double> rightPosition;
 	ArrayList<Double> leftPosition;
@@ -42,10 +43,11 @@ public class Display extends JPanel implements ActionListener {
 	boolean pathFlag = false;
 	int pathCounter = 0;
 	JFrame frame;
-	Display panel;
+	public Display panel;
 	Graphics2D g2;
+	String robotLocation;
 
-	public Display(String macroLocation, String imageLocation) {
+	public Display(String macroLocation, String backgroundLocation, String robotLocation) {
 
 		drawPath = new JButton("Show Path");
 		drawPath.setActionCommand("show path");
@@ -53,7 +55,8 @@ public class Display extends JPanel implements ActionListener {
 		drawPath.setVisible(false);
 
 		this.macroLocation = macroLocation;
-		this.imageLocation = imageLocation;
+		this.imageLocation = backgroundLocation;
+		this.robotLocation = robotLocation;
 		rightPosition = CSVParser.readRightPosition(macroLocation);
 		leftPosition = CSVParser.readLeftPosition(macroLocation);
 
@@ -102,7 +105,9 @@ public class Display extends JPanel implements ActionListener {
 		});
 
 		try {
-			image = ImageIO.read(new File(imageLocation));
+			background = ImageIO.read(new File(backgroundLocation));
+			
+			robot = ImageIO.read(new File(robotLocation));
 		} catch (IOException e) {
 
 		}
@@ -111,14 +116,14 @@ public class Display extends JPanel implements ActionListener {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.drawImage(image, -100, -1800, this);
+		g.drawImage(background, -100, -1800, this);
 		g2 = (Graphics2D) g;
 		g.setFont(new Font("Arial", Font.PLAIN, 14));
 		if (math != null) {
 			Draw.drawPath(g2, rightCoords, leftCoords);
 			if (pathFlag) {
 				if (pathCounter < rightCoords.size()) {
-					Draw.drawRobot(g2, rightCoords, leftCoords, pathCounter);
+					Draw.drawRobot(g2, rightCoords, leftCoords, robot, pathCounter);
 				}
 			}
 		}
@@ -129,7 +134,7 @@ public class Display extends JPanel implements ActionListener {
 			@Override
 			public void run() {
 				frame = new JFrame();
-				panel = new Display(macroLocation, imageLocation);
+				panel = new Display(macroLocation, imageLocation, robotLocation);
 				panel.add(drawPath);
 				frame.add(panel);
 				frame.setSize(Toolkit.getDefaultToolkit().getScreenSize().width + 100,
@@ -158,18 +163,16 @@ public class Display extends JPanel implements ActionListener {
 				public void run() {
 					pathFlag = true;
 
-					for (int i = 0; i < rightCoords.size(); i++) {
+					for (int i = 0; i < rightCoords.size(); i = i + 2) {
 						int j = i;
-						panel = new Display(macroLocation, imageLocation);
+						panel = new Display(macroLocation, imageLocation, robotLocation);
 						pathCounter = j;
-						System.out.println(pathCounter);
-						System.out.println(String.valueOf(MouseInfo.getPointerInfo().getLocation()));
 						try {
 							Robot bot = new Robot();
 							if(i < 2) {
-								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x + 10000, MouseInfo.getPointerInfo().getLocation().y);
+								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x + 100, MouseInfo.getPointerInfo().getLocation().y);
 							}
-							if(i % 2 == 0 ) {
+							if(i % 4 == 0 ) {
 								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x, MouseInfo.getPointerInfo().getLocation().y + 1);
 							} else {
 								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x, MouseInfo.getPointerInfo().getLocation().y - 1);
