@@ -120,6 +120,8 @@ public abstract class Parser {
 	 *            the file to cache
 	 */
 	protected static List<String[]> cache(String directory, String filename) {
+		filename = format(directory, filename);
+		
 		if (cache.containsKey(filename)) {
 			DriverStation.getInstance();
 			DriverStation.reportWarning("Tried to cache an already cached file!", false);
