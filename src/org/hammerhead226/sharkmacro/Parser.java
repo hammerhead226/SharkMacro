@@ -121,15 +121,15 @@ public abstract class Parser {
 	 */
 	protected static List<String[]> cache(String directory, String filename) {
 		filename = format(directory, filename);
-		
+
 		if (cache.containsKey(filename)) {
 			DriverStation.getInstance();
 			DriverStation.reportWarning("Tried to cache an already cached file!", false);
 			return cache.get(filename);
 		}
-		
+
 		List<String[]> rawFile = parseCSV(filename);
-		
+
 		cache.put(filename, rawFile);
 
 		return rawFile;
@@ -148,10 +148,27 @@ public abstract class Parser {
 		}
 
 		List<String[]> rawFile = parseCSV(filename);
-		
+
 		cache.put(filename, rawFile);
-		
+
 		return rawFile;
+	}
+
+	/**
+	 * Add all CSV files in a directory to the cache.
+	 * 
+	 * @param directory
+	 *            the directory the files are located in
+	 */
+	protected static void cacheAll(String directory) {
+		File[] files = new File(directory).listFiles();
+
+		for (File f : files) {
+			if (f.isFile()) {
+				cache(directory, f.getName());
+			}
+		}
+
 	}
 
 	/**
@@ -178,7 +195,7 @@ public abstract class Parser {
 
 		return rawFile;
 	}
-	
+
 	/**
 	 * @return a set of the keys in the cache
 	 */

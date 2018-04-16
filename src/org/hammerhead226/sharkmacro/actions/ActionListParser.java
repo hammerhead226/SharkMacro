@@ -95,6 +95,13 @@ public class ActionListParser extends Parser {
 	}
 
 	/**
+	 * Cache all action lists in the action list storage directory.
+	 */
+	public static void cacheAll() {
+		Parser.cacheAll(Constants.ACTIONLIST_STORAGE_DIRECTORY);
+	}
+
+	/**
 	 * This method generates a new filename to be used for saving a new file. For
 	 * example, if the newest file in the storage directory is
 	 * {@code prefix0003.csv}, the method will return {@code prefix0004.csv}.
