@@ -13,7 +13,8 @@ public class SharkMath {
 	double adjustment;
 	double w;
 
-	public SharkMath(Point rightStart, Point leftStart, ArrayList<Double> right, ArrayList<Double> left, double w, double adjustment) {
+	public SharkMath(Point rightStart, Point leftStart, ArrayList<Double> right, ArrayList<Double> left, double w,
+			double adjustment) {
 		for (int i = 0; i < right.size() - 1 && i < left.size() - 1; i++) {
 			this.rightPosition.add(right.get(i + 1) - right.get(i));
 			this.leftPosition.add(left.get(i + 1) - left.get(i));
@@ -44,24 +45,25 @@ public class SharkMath {
 				(int) (100 * (adjustedMag(left_p) * Math.sin(heading)) + left.y));
 		Point rightCoords = new Point((int) (100 * (adjustedMag(right_p) * Math.cos(heading)) + right.x),
 				(int) (100 * (adjustedMag(right_p) * Math.sin(heading)) + right.y));
-		
+
 		double midpointX = 0.5 * (leftCoords.x + rightCoords.x);
 		double midpointY = 0.5 * (leftCoords.y + rightCoords.y);
-		
+
 		double leftMidX = leftCoords.x - midpointX;
 		double leftMidY = leftCoords.y - midpointY;
 		double rightMidX = rightCoords.x - midpointX;
 		double rightMidY = rightCoords.y - midpointY;
-		
-		double deviatedWidth = Math.sqrt(Math.pow(leftCoords.x - rightCoords.x, 2) + Math.pow(leftCoords.y - rightCoords.y, 2));
-		
+
+		double deviatedWidth = Math
+				.sqrt(Math.pow(leftCoords.x - rightCoords.x, 2) + Math.pow(leftCoords.y - rightCoords.y, 2));
+
 		double fixFactor = w / deviatedWidth;
-		
+
 		leftCoords.x = (int) (leftMidX * fixFactor + midpointX);
 		leftCoords.y = (int) (leftMidY * fixFactor + midpointY);
 		rightCoords.x = (int) (rightMidX * fixFactor + midpointX);
 		rightCoords.y = (int) (rightMidY * fixFactor + midpointY);
-		
+
 		ArrayList<Point> temp = new ArrayList<Point>(2);
 		temp.add(leftCoords);
 		temp.add(rightCoords);

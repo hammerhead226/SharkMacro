@@ -38,6 +38,5 @@ public class Draw {
 		g.setColor(Color.BLACK);
 		g.drawLine(width - (left.get(point).y / 120), height - (left.get(point).x / 120),
 				width - (right.get(point).y / 120), height - (right.get(point).x / 120));
-
 	}
 }

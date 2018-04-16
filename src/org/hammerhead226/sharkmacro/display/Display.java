@@ -18,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -32,12 +33,22 @@ public class Display extends JPanel implements ActionListener {
 	private BufferedImage background;
 	private BufferedImage robot;
 	private static JButton drawPath;
+	private static JButton one;
+	private static JButton two;
+	private static JButton three;
 	ArrayList<Double> rightPosition;
 	ArrayList<Double> leftPosition;
+
+	ArrayList<Double> rightPosition1;
+	ArrayList<Double> leftPosition1;
+
+	ArrayList<Double> rightPosition2;
+	ArrayList<Double> leftPosition2;
+
 	ArrayList<Point> rightCoords;
 	ArrayList<Point> leftCoords;
 	boolean clickFlag = false;
-	String macroLocation;
+	List<String> macroLocation;
 	String imageLocation;
 	SharkMath math;
 	boolean pathFlag = false;
@@ -47,23 +58,28 @@ public class Display extends JPanel implements ActionListener {
 	Graphics2D g2;
 	String robotLocation;
 
-	public Display(String macroLocation, String backgroundLocation, String robotLocation) {
+	public Display(List<String> macroLocation, String backgroundLocation, String robotLocation) {
 
 		drawPath = new JButton("Show Path");
 		drawPath.setActionCommand("show path");
 		drawPath.addActionListener(this);
-		drawPath.setVisible(false);
+		drawPath.setEnabled(false);
+
+		one = new JButton("Path One");
+		one.setActionCommand("one");
+		one.addActionListener(this);
+
+		three = new JButton("Path Three");
+		three.setActionCommand("three");
+		three.addActionListener(this);
+
+		two = new JButton("Path Two");
+		two.setActionCommand("two");
+		two.addActionListener(this);
 
 		this.macroLocation = macroLocation;
 		this.imageLocation = backgroundLocation;
 		this.robotLocation = robotLocation;
-		rightPosition = CSVParser.readRightPosition(macroLocation);
-		leftPosition = CSVParser.readLeftPosition(macroLocation);
-
-		for (int i = 0; i < rightPosition.size() && i < leftPosition.size(); i++) {
-			rightPosition.set(i, rightPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
-			leftPosition.set(i, leftPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
-		}
 
 		addMouseMotionListener(new MouseMotionAdapter() {
 
@@ -71,8 +87,8 @@ public class Display extends JPanel implements ActionListener {
 			public void mouseMoved(MouseEvent e) {
 				repaint();
 				if (!clickFlag) {
-					math = new SharkMath(new Point(height - e.getY(), width - (e.getX() - 65)),
-							new Point(height - e.getY(), width - (e.getX() + 65)), rightPosition, leftPosition, 130,
+					math = new SharkMath(new Point(height - e.getY(), width - (e.getX() - 95)),
+							new Point(height - e.getY(), width - (e.getX() + 35)), rightPosition, leftPosition, 130,
 							0.97);
 
 					rightCoords = math.createCoordList().get(1);
@@ -88,13 +104,13 @@ public class Display extends JPanel implements ActionListener {
 			public void mousePressed(MouseEvent e) {
 				if (!clickFlag) {
 					clickFlag = true;
-					drawPath.setVisible(true);
+					drawPath.setEnabled(true);
 
 				} else {
-					drawPath.setVisible(false);
+					drawPath.setEnabled(false);
 					clickFlag = false;
-					math = new SharkMath(new Point(e.getY(), width - (e.getX() - 65)),
-							new Point(e.getY(), width - (e.getX() + 65)), rightPosition, leftPosition, 100, 0.97);
+					math = new SharkMath(new Point(e.getY(), width - (e.getX() - 95)),
+							new Point(e.getY(), width - (e.getX() + 35)), rightPosition, leftPosition, 100, 0.97);
 
 					rightCoords = math.createCoordList().get(1);
 					leftCoords = math.createCoordList().get(0);
@@ -106,7 +122,7 @@ public class Display extends JPanel implements ActionListener {
 
 		try {
 			background = ImageIO.read(new File(backgroundLocation));
-			
+
 			robot = ImageIO.read(new File(robotLocation));
 		} catch (IOException e) {
 
@@ -116,7 +132,7 @@ public class Display extends JPanel implements ActionListener {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.drawImage(background, -100, -1800, this);
+		g.drawImage(background, -150, -1775, this);
 		g2 = (Graphics2D) g;
 		g.setFont(new Font("Arial", Font.PLAIN, 14));
 		if (math != null) {
@@ -136,6 +152,9 @@ public class Display extends JPanel implements ActionListener {
 				frame = new JFrame();
 				panel = new Display(macroLocation, imageLocation, robotLocation);
 				panel.add(drawPath);
+				panel.add(one);
+				panel.add(two);
+				panel.add(three);
 				frame.add(panel);
 				frame.setSize(Toolkit.getDefaultToolkit().getScreenSize().width + 100,
 						Toolkit.getDefaultToolkit().getScreenSize().height + 100);
@@ -156,39 +175,183 @@ public class Display extends JPanel implements ActionListener {
 
 		if ("show path".equals(e.getActionCommand())) {
 
-			
-
 			new Thread() {
 
 				public void run() {
 					pathFlag = true;
 
-					for (int i = 0; i < rightCoords.size(); i = i + 2) {
+					for (int i = 0; i < rightCoords.size(); i = i + 3) {
 						int j = i;
 						panel = new Display(macroLocation, imageLocation, robotLocation);
 						pathCounter = j;
 						try {
 							Robot bot = new Robot();
-							if(i < 2) {
-								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x + 100, MouseInfo.getPointerInfo().getLocation().y);
+							if (i < 2) {
+								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x + 1000,
+										MouseInfo.getPointerInfo().getLocation().y);
 							}
-							if(i % 4 == 0 ) {
-								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x, MouseInfo.getPointerInfo().getLocation().y + 1);
+							if (i % 6 == 0) {
+								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x,
+										MouseInfo.getPointerInfo().getLocation().y + 1);
 							} else {
-								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x, MouseInfo.getPointerInfo().getLocation().y - 1);
+								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x,
+										MouseInfo.getPointerInfo().getLocation().y - 1);
+							}
+
+							if (i > rightCoords.size() - 2) {
+								bot.mouseMove(750, 40);
 							}
 						} catch (Exception k) {
 						}
 						panel.repaint();
 
 						try {
-							Thread.sleep(1 	);
+							Thread.sleep(1);
 						} catch (Exception k) {
 						}
 					}
 
 				}
 			}.start();
+		}
+
+		if ("one".equals(e.getActionCommand())) {
+
+			String[] split = macroLocation.get(0).split("&");
+
+			if (split.length >= 1) {
+				rightPosition = CSVParser.readRightPosition(split[0]);
+				leftPosition = CSVParser.readLeftPosition(split[0]);
+			}
+
+			if (split.length >= 2) {
+				rightPosition1 = CSVParser.readRightPosition(split[1]);
+				leftPosition1 = CSVParser.readLeftPosition(split[1]);
+			}
+
+			if (split.length >= 3) {
+				rightPosition2 = CSVParser.readRightPosition(split[2]);
+				leftPosition2 = CSVParser.readLeftPosition(split[2]);
+			}
+			if (rightPosition != null && leftPosition != null) {
+				for (int i = 0; i < rightPosition.size() && i < leftPosition.size(); i++) {
+					rightPosition.set(i, rightPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
+					leftPosition.set(i, leftPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
+				}
+			}
+
+			if (rightPosition1 != null && leftPosition1 != null) {
+				for (int i = 0; i < rightPosition1.size() && i < leftPosition1.size(); i++) {
+					rightPosition1.set(i, (rightPosition1.get(i) * 6.15 * Math.PI / 4096 * 5.8)
+							+ rightPosition.get(rightPosition.size() - 1));
+					leftPosition1.set(i, (leftPosition1.get(i) * 6.15 * Math.PI / 4096 * 5.8)
+							+ rightPosition.get(leftPosition.size() - 1));
+				}
+				rightPosition.addAll(rightPosition1);
+				leftPosition.addAll(leftPosition1);
+			}
+
+			if (rightPosition2 != null && leftPosition2 != null) {
+				for (int i = 0; i < rightPosition2.size() && i < leftPosition2.size(); i++) {
+					rightPosition2.set(i, rightPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + rightPosition.get(rightPosition.size() - 1));
+					leftPosition2.set(i, leftPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + leftPosition.get(leftPosition.size() - 1));
+				}
+
+				rightPosition.addAll(rightPosition2);
+				leftPosition.addAll(leftPosition2);
+			}
+
+		}
+		if ("three".equals(e.getActionCommand())) {
+
+			String[] split = macroLocation.get(2).split("&");
+
+			if (split.length >= 1) {
+				rightPosition = CSVParser.readRightPosition(split[0]);
+				leftPosition = CSVParser.readLeftPosition(split[0]);
+			}
+
+			if (split.length >= 2) {
+				rightPosition1 = CSVParser.readRightPosition(split[1]);
+				leftPosition1 = CSVParser.readLeftPosition(split[1]);
+			}
+
+			if (split.length >= 3) {
+				rightPosition2 = CSVParser.readRightPosition(split[2]);
+				leftPosition2 = CSVParser.readLeftPosition(split[2]);
+			}
+			if (rightPosition != null && leftPosition != null) {
+				for (int i = 0; i < rightPosition.size() && i < leftPosition.size(); i++) {
+					rightPosition.set(i, rightPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
+					leftPosition.set(i, leftPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
+				}
+			}
+
+			if (rightPosition1 != null && leftPosition1 != null) {
+				for (int i = 0; i < rightPosition1.size() && i < leftPosition1.size(); i++) {
+					rightPosition1.set(i, (rightPosition1.get(i) * 6.15 * Math.PI / 4096 * 5.8)
+							+ rightPosition.get(rightPosition.size() - 1));
+					leftPosition1.set(i, (leftPosition1.get(i) * 6.15 * Math.PI / 4096 * 5.8)
+							+ rightPosition.get(leftPosition.size() - 1));
+				}
+				rightPosition.addAll(rightPosition1);
+				leftPosition.addAll(leftPosition1);
+			}
+
+			if (rightPosition2 != null && leftPosition2 != null) {
+				for (int i = 0; i < rightPosition2.size() && i < leftPosition2.size(); i++) {
+					rightPosition2.set(i, rightPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + rightPosition.get(rightPosition.size() - 1));
+					leftPosition2.set(i, leftPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + leftPosition.get(leftPosition.size() - 1));
+				}
+
+				rightPosition.addAll(rightPosition2);
+				leftPosition.addAll(leftPosition2);
+			}
+		}
+		if ("two".equals(e.getActionCommand())) {
+			String[] split = macroLocation.get(1).split("&");
+
+			if (split.length >= 1) {
+				rightPosition = CSVParser.readRightPosition(split[0]);
+				leftPosition = CSVParser.readLeftPosition(split[0]);
+			}
+
+			if (split.length >= 2) {
+				rightPosition1 = CSVParser.readRightPosition(split[1]);
+				leftPosition1 = CSVParser.readLeftPosition(split[1]);
+			}
+
+			if (split.length >= 3) {
+				rightPosition2 = CSVParser.readRightPosition(split[2]);
+				leftPosition2 = CSVParser.readLeftPosition(split[2]);
+			}
+			if (rightPosition != null && leftPosition != null) {
+				for (int i = 0; i < rightPosition.size() && i < leftPosition.size(); i++) {
+					rightPosition.set(i, rightPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
+					leftPosition.set(i, leftPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
+				}
+			}
+
+			if (rightPosition1 != null && leftPosition1 != null) {
+				for (int i = 0; i < rightPosition1.size() && i < leftPosition1.size(); i++) {
+					rightPosition1.set(i, (rightPosition1.get(i) * 6.15 * Math.PI / 4096 * 5.8)
+							+ rightPosition.get(rightPosition.size() - 1));
+					leftPosition1.set(i, (leftPosition1.get(i) * 6.15 * Math.PI / 4096 * 5.8)
+							+ rightPosition.get(leftPosition.size() - 1));
+				}
+				rightPosition.addAll(rightPosition1);
+				leftPosition.addAll(leftPosition1);
+			}
+
+			if (rightPosition2 != null && leftPosition2 != null) {
+				for (int i = 0; i < rightPosition2.size() && i < leftPosition2.size(); i++) {
+					rightPosition2.set(i, rightPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + rightPosition.get(rightPosition.size() - 1));
+					leftPosition2.set(i, leftPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + leftPosition.get(leftPosition.size() - 1));
+				}
+
+				rightPosition.addAll(rightPosition2);
+				leftPosition.addAll(leftPosition2);
+			}
 		}
 
 	}
