@@ -161,12 +161,17 @@ public abstract class Parser {
 	 *            the directory the files are located in
 	 */
 	protected static void cacheAll(String directory) {
-		File[] files = new File(directory).listFiles();
+		if (Files.exists(Paths.get(directory))) {
+			File[] files = new File(directory).listFiles();
 
-		for (File f : files) {
-			if (f.isFile()) {
-				cache(directory, f.getName());
+			for (File f : files) {
+				if (f.isFile()) {
+					cache(directory, f.getName());
+				}
 			}
+		} else {
+			DriverStation.getInstance();
+			DriverStation.reportError("No such directory exists!", false);
 		}
 
 	}
