@@ -102,6 +102,13 @@ public final class ProfileParser extends Parser {
 	public static void cache(String filename) {
 		Parser.cache(Constants.PROFILE_STORAGE_DIRECTORY, filename);
 	}
+	
+	/**
+	 * Cache all profiles in the profile storage directory.
+	 */
+	public static void cacheAll() {
+		Parser.cacheAll(Constants.PROFILE_STORAGE_DIRECTORY);
+	}
 
 	/**
 	 * This method generates a new filename to be used for saving a new file. For
