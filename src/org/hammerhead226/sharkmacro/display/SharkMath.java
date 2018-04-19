@@ -8,8 +8,10 @@ public class SharkMath {
 
 	ArrayList<Double> rightPosition = new ArrayList<Double>();
 	ArrayList<Double> leftPosition = new ArrayList<Double>();
+
 	Point rightStart = new Point(0, 0);
 	Point leftStart = new Point(0, 0);
+
 	double adjustment;
 	double w;
 
@@ -86,5 +88,5 @@ public class SharkMath {
 		ArrayList<ArrayList<Point>> temp = new ArrayList<ArrayList<Point>>(Arrays.asList(tempLeft, tempRight));
 		return temp;
 	}
-
+	
 }
