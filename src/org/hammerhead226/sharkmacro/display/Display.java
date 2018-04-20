@@ -27,51 +27,36 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 public class Display extends JPanel implements ActionListener {
-	
 	private static final long serialVersionUID = 1L;
-	
-	private int height = Toolkit.getDefaultToolkit().getScreenSize().height;
+	private static int height = Toolkit.getDefaultToolkit().getScreenSize().height;
 	private static int width = Toolkit.getDefaultToolkit().getScreenSize().width;
-	
 	private BufferedImage background;
 	private BufferedImage robot;
-	
-	private JButton drawPath;
-	private JButton one;
-	private JButton two;
-	private JButton three;
-	
-	private int pathCounter = 0;
-	private double scale = 6.15 * Math.PI / 4096 * 5.8;
-	
-	private ArrayList<Double> rightPosition;
-	private ArrayList<Double> leftPosition;
+	private static JButton drawPath;
+	private static JButton one;
+	private static JButton two;
+	private static JButton three;
+	ArrayList<Double> rightPosition;
+	ArrayList<Double> leftPosition;
 
-	private ArrayList<Double> rightPosition1;
-	private ArrayList<Double> leftPosition1;
+	ArrayList<Double> rightPosition1;
+	ArrayList<Double> leftPosition1;
 
-	private ArrayList<Double> rightPosition2;
-	private ArrayList<Double> leftPosition2;
+	ArrayList<Double> rightPosition2;
+	ArrayList<Double> leftPosition2;
 
-	private ArrayList<Point> rightCoords;
-	private ArrayList<Point> leftCoords;
-	
-	private List<String> macroLocation;
-	
-	private boolean clickFlag = false;
-	private boolean pathFlag = false;
-	
-	private SharkMath math;
-	
-	private String imageLocation;
-	private String robotLocation;
-	
-	private Display panel;
-	
+	ArrayList<Point> rightCoords;
+	ArrayList<Point> leftCoords;
+	boolean clickFlag = false;
+	List<String> macroLocation;
+	String imageLocation;
+	SharkMath math;
+	boolean pathFlag = false;
+	int pathCounter = 0;
 	JFrame frame;
-	
+	public Display panel;
 	Graphics2D g2;
-	
+	String robotLocation;
 
 	public Display(List<String> macroLocation, String backgroundLocation, String robotLocation) {
 
@@ -100,9 +85,7 @@ public class Display extends JPanel implements ActionListener {
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				
 				repaint();
-				
 				if (!clickFlag) {
 					math = new SharkMath(new Point(height - e.getY(), width - (e.getX() - 95)),
 							new Point(height - e.getY(), width - (e.getX() + 35)), rightPosition, leftPosition, 130,
@@ -110,6 +93,8 @@ public class Display extends JPanel implements ActionListener {
 
 					rightCoords = math.createCoordList().get(1);
 					leftCoords = math.createCoordList().get(0);
+
+					repaint();
 				}
 			}
 		});
@@ -117,7 +102,6 @@ public class Display extends JPanel implements ActionListener {
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				
 				if (!clickFlag) {
 					clickFlag = true;
 					drawPath.setEnabled(true);
@@ -251,16 +235,16 @@ public class Display extends JPanel implements ActionListener {
 			}
 			if (rightPosition != null && leftPosition != null) {
 				for (int i = 0; i < rightPosition.size() && i < leftPosition.size(); i++) {
-					rightPosition.set(i, rightPosition.get(i) * scale);
-					leftPosition.set(i, leftPosition.get(i) * scale);
+					rightPosition.set(i, rightPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
+					leftPosition.set(i, leftPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
 				}
 			}
 
 			if (rightPosition1 != null && leftPosition1 != null) {
 				for (int i = 0; i < rightPosition1.size() && i < leftPosition1.size(); i++) {
-					rightPosition1.set(i, (rightPosition1.get(i) * scale)
+					rightPosition1.set(i, (rightPosition1.get(i) * 6.15 * Math.PI / 4096 * 5.8)
 							+ rightPosition.get(rightPosition.size() - 1));
-					leftPosition1.set(i, (leftPosition1.get(i) * scale)
+					leftPosition1.set(i, (leftPosition1.get(i) * 6.15 * Math.PI / 4096 * 5.8)
 							+ rightPosition.get(leftPosition.size() - 1));
 				}
 				rightPosition.addAll(rightPosition1);
@@ -269,10 +253,8 @@ public class Display extends JPanel implements ActionListener {
 
 			if (rightPosition2 != null && leftPosition2 != null) {
 				for (int i = 0; i < rightPosition2.size() && i < leftPosition2.size(); i++) {
-					rightPosition2.set(i, rightPosition2.get(i) * scale
-							+ rightPosition.get(rightPosition.size() - 1));
-					leftPosition2.set(i, leftPosition2.get(i) * scale
-							+ leftPosition.get(leftPosition.size() - 1));
+					rightPosition2.set(i, rightPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + rightPosition.get(rightPosition.size() - 1));
+					leftPosition2.set(i, leftPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + leftPosition.get(leftPosition.size() - 1));
 				}
 
 				rightPosition.addAll(rightPosition2);
@@ -300,16 +282,16 @@ public class Display extends JPanel implements ActionListener {
 			}
 			if (rightPosition != null && leftPosition != null) {
 				for (int i = 0; i < rightPosition.size() && i < leftPosition.size(); i++) {
-					rightPosition.set(i, rightPosition.get(i) * scale);
-					leftPosition.set(i, leftPosition.get(i) * scale);
+					rightPosition.set(i, rightPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
+					leftPosition.set(i, leftPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
 				}
 			}
 
 			if (rightPosition1 != null && leftPosition1 != null) {
 				for (int i = 0; i < rightPosition1.size() && i < leftPosition1.size(); i++) {
-					rightPosition1.set(i, (rightPosition1.get(i) * scale)
+					rightPosition1.set(i, (rightPosition1.get(i) * 6.15 * Math.PI / 4096 * 5.8)
 							+ rightPosition.get(rightPosition.size() - 1));
-					leftPosition1.set(i, (leftPosition1.get(i) * scale)
+					leftPosition1.set(i, (leftPosition1.get(i) * 6.15 * Math.PI / 4096 * 5.8)
 							+ rightPosition.get(leftPosition.size() - 1));
 				}
 				rightPosition.addAll(rightPosition1);
@@ -318,10 +300,8 @@ public class Display extends JPanel implements ActionListener {
 
 			if (rightPosition2 != null && leftPosition2 != null) {
 				for (int i = 0; i < rightPosition2.size() && i < leftPosition2.size(); i++) {
-					rightPosition2.set(i, rightPosition2.get(i) * scale
-							+ rightPosition.get(rightPosition.size() - 1));
-					leftPosition2.set(i, leftPosition2.get(i) * scale
-							+ leftPosition.get(leftPosition.size() - 1));
+					rightPosition2.set(i, rightPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + rightPosition.get(rightPosition.size() - 1));
+					leftPosition2.set(i, leftPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + leftPosition.get(leftPosition.size() - 1));
 				}
 
 				rightPosition.addAll(rightPosition2);
@@ -347,16 +327,16 @@ public class Display extends JPanel implements ActionListener {
 			}
 			if (rightPosition != null && leftPosition != null) {
 				for (int i = 0; i < rightPosition.size() && i < leftPosition.size(); i++) {
-					rightPosition.set(i, rightPosition.get(i) * scale);
-					leftPosition.set(i, leftPosition.get(i) * scale);
+					rightPosition.set(i, rightPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
+					leftPosition.set(i, leftPosition.get(i) * 6.15 * Math.PI / 4096 * 5.8);
 				}
 			}
 
 			if (rightPosition1 != null && leftPosition1 != null) {
 				for (int i = 0; i < rightPosition1.size() && i < leftPosition1.size(); i++) {
-					rightPosition1.set(i, (rightPosition1.get(i) * scale)
+					rightPosition1.set(i, (rightPosition1.get(i) * 6.15 * Math.PI / 4096 * 5.8)
 							+ rightPosition.get(rightPosition.size() - 1));
-					leftPosition1.set(i, (leftPosition1.get(i) * scale)
+					leftPosition1.set(i, (leftPosition1.get(i) * 6.15 * Math.PI / 4096 * 5.8)
 							+ rightPosition.get(leftPosition.size() - 1));
 				}
 				rightPosition.addAll(rightPosition1);
@@ -365,10 +345,8 @@ public class Display extends JPanel implements ActionListener {
 
 			if (rightPosition2 != null && leftPosition2 != null) {
 				for (int i = 0; i < rightPosition2.size() && i < leftPosition2.size(); i++) {
-					rightPosition2.set(i, rightPosition2.get(i) * scale
-							+ rightPosition.get(rightPosition.size() - 1));
-					leftPosition2.set(i, leftPosition2.get(i) * scale
-							+ leftPosition.get(leftPosition.size() - 1));
+					rightPosition2.set(i, rightPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + rightPosition.get(rightPosition.size() - 1));
+					leftPosition2.set(i, leftPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + leftPosition.get(leftPosition.size() - 1));
 				}
 
 				rightPosition.addAll(rightPosition2);
