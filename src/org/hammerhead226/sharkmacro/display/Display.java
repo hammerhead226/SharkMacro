@@ -28,35 +28,46 @@ import javax.swing.SwingUtilities;
 
 public class Display extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
+
 	private static int height = Toolkit.getDefaultToolkit().getScreenSize().height;
 	private static int width = Toolkit.getDefaultToolkit().getScreenSize().width;
+	private int pathCounter = 0;
+
 	private BufferedImage background;
 	private BufferedImage robot;
+
 	private static JButton drawPath;
 	private static JButton one;
 	private static JButton two;
 	private static JButton three;
-	ArrayList<Double> rightPosition;
-	ArrayList<Double> leftPosition;
 
-	ArrayList<Double> rightPosition1;
-	ArrayList<Double> leftPosition1;
+	private ArrayList<Double> rightPosition;
+	private ArrayList<Double> leftPosition;
 
-	ArrayList<Double> rightPosition2;
-	ArrayList<Double> leftPosition2;
+	private ArrayList<Double> rightPosition1;
+	private ArrayList<Double> leftPosition1;
 
-	ArrayList<Point> rightCoords;
-	ArrayList<Point> leftCoords;
-	boolean clickFlag = false;
-	List<String> macroLocation;
-	String imageLocation;
+	private ArrayList<Double> rightPosition2;
+	private ArrayList<Double> leftPosition2;
+
+	private ArrayList<Point> rightCoords;
+	private ArrayList<Point> leftCoords;
+
+	private boolean clickFlag = false;
+	private boolean pathFlag = false;
+
 	SharkMath math;
-	boolean pathFlag = false;
-	int pathCounter = 0;
-	JFrame frame;
-	public Display panel;
-	Graphics2D g2;
+
+	List<String> macroLocation;
+
+	String imageLocation;
 	String robotLocation;
+
+	JFrame frame;
+
+	public Display panel;
+	
+	Graphics2D g2;
 
 	public Display(List<String> macroLocation, String backgroundLocation, String robotLocation) {
 
@@ -253,8 +264,10 @@ public class Display extends JPanel implements ActionListener {
 
 			if (rightPosition2 != null && leftPosition2 != null) {
 				for (int i = 0; i < rightPosition2.size() && i < leftPosition2.size(); i++) {
-					rightPosition2.set(i, rightPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + rightPosition.get(rightPosition.size() - 1));
-					leftPosition2.set(i, leftPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + leftPosition.get(leftPosition.size() - 1));
+					rightPosition2.set(i, rightPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8
+							+ rightPosition.get(rightPosition.size() - 1));
+					leftPosition2.set(i, leftPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8
+							+ leftPosition.get(leftPosition.size() - 1));
 				}
 
 				rightPosition.addAll(rightPosition2);
@@ -300,8 +313,10 @@ public class Display extends JPanel implements ActionListener {
 
 			if (rightPosition2 != null && leftPosition2 != null) {
 				for (int i = 0; i < rightPosition2.size() && i < leftPosition2.size(); i++) {
-					rightPosition2.set(i, rightPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + rightPosition.get(rightPosition.size() - 1));
-					leftPosition2.set(i, leftPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + leftPosition.get(leftPosition.size() - 1));
+					rightPosition2.set(i, rightPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8
+							+ rightPosition.get(rightPosition.size() - 1));
+					leftPosition2.set(i, leftPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8
+							+ leftPosition.get(leftPosition.size() - 1));
 				}
 
 				rightPosition.addAll(rightPosition2);
@@ -345,8 +360,10 @@ public class Display extends JPanel implements ActionListener {
 
 			if (rightPosition2 != null && leftPosition2 != null) {
 				for (int i = 0; i < rightPosition2.size() && i < leftPosition2.size(); i++) {
-					rightPosition2.set(i, rightPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + rightPosition.get(rightPosition.size() - 1));
-					leftPosition2.set(i, leftPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8 + leftPosition.get(leftPosition.size() - 1));
+					rightPosition2.set(i, rightPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8
+							+ rightPosition.get(rightPosition.size() - 1));
+					leftPosition2.set(i, leftPosition2.get(i) * 6.15 * Math.PI / 4096 * 5.8
+							+ leftPosition.get(leftPosition.size() - 1));
 				}
 
 				rightPosition.addAll(rightPosition2);
