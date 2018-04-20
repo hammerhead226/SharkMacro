@@ -14,7 +14,7 @@ public class SharkMath {
 	double w;
 
 	public SharkMath(Point rightStart, Point leftStart, ArrayList<Double> right, ArrayList<Double> left, double w,
-			double adjustment) {
+			double adjustment){
 		for (int i = 0; i < right.size() - 1 && i < left.size() - 1; i++) {
 			this.rightPosition.add(right.get(i + 1) - right.get(i));
 			this.leftPosition.add(left.get(i + 1) - left.get(i));
