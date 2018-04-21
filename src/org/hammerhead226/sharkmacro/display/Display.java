@@ -1,5 +1,6 @@
 package org.hammerhead226.sharkmacro.display;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -22,8 +23,10 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 public class Display extends JPanel implements ActionListener {
@@ -39,7 +42,14 @@ public class Display extends JPanel implements ActionListener {
 	private static JButton drawPath;
 	private static JButton one;
 	private static JButton two;
-	private static JButton three;
+	private static JButton select;
+	private static JButton add;
+
+	private static JTextField path1;
+	private static JTextField path2;
+	private static JTextField path3;
+
+	private static JComboBox pathChooser;
 
 	private ArrayList<Double> rightPosition;
 	private ArrayList<Double> leftPosition;
@@ -66,12 +76,30 @@ public class Display extends JPanel implements ActionListener {
 	private JFrame frame;
 
 	public Display panel;
-	
+
+	private String previousSelection;
+
 	private Graphics2D g2;
-	
+
 	private double scale = 6.15 * Math.PI / 4096 * 5.8;
 
 	public Display(List<String> macroLocation, String backgroundLocation, String robotLocation) {
+
+		path1 = new JTextField(20);
+		path2 = new JTextField(20);
+		path3 = new JTextField(20);
+
+		pathChooser = new JComboBox((String[]) macroLocation.toArray());
+		pathChooser.setEditable(true);
+
+		path1.setText(macroLocation.get(0));
+		path2.setText(macroLocation.get(1));
+		path3.setText(macroLocation.get(2));
+
+		add = new JButton("Add Path");
+		add.setActionCommand("add");
+		add.addActionListener(this);
+		add.setEnabled(true);
 
 		drawPath = new JButton("Show Path");
 		drawPath.setActionCommand("show path");
@@ -82,9 +110,9 @@ public class Display extends JPanel implements ActionListener {
 		one.setActionCommand("one");
 		one.addActionListener(this);
 
-		three = new JButton("Path Three");
-		three.setActionCommand("three");
-		three.addActionListener(this);
+		select = new JButton("Select");
+		select.setActionCommand("select");
+		select.addActionListener(this);
 
 		two = new JButton("Path Two");
 		two.setActionCommand("two");
@@ -100,15 +128,16 @@ public class Display extends JPanel implements ActionListener {
 			public void mouseMoved(MouseEvent e) {
 				repaint();
 				if (!clickFlag) {
-					math = new SharkMath(new Point(height - e.getY(), width - (e.getX() - 95)),
-							new Point(height - e.getY(), width - (e.getX() + 35)), rightPosition, leftPosition, 130,
-							0.97);
+					if (rightPosition != null & leftPosition != null) {
+						math = new SharkMath(new Point(height - e.getY(), width - (e.getX() - 95)),
+								new Point(height - e.getY(), width - (e.getX() + 35)), rightPosition, leftPosition, 130,
+								0.97);
 
-					rightCoords = math.createCoordList().get(1);
-					leftCoords = math.createCoordList().get(0);
-
-					repaint();
+						rightCoords = math.createCoordList().get(1);
+						leftCoords = math.createCoordList().get(0);
+					}
 				}
+
 			}
 		});
 
@@ -116,17 +145,21 @@ public class Display extends JPanel implements ActionListener {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (!clickFlag) {
-					clickFlag = true;
-					drawPath.setEnabled(true);
+					if (math != null) {
+						clickFlag = true;
+						drawPath.setEnabled(true);
+					}
 
 				} else {
 					drawPath.setEnabled(false);
 					clickFlag = false;
-					math = new SharkMath(new Point(e.getY(), width - (e.getX() - 95)),
-							new Point(e.getY(), width - (e.getX() + 35)), rightPosition, leftPosition, 100, 0.97);
+					if (rightPosition != null && leftPosition != null) {
+						math = new SharkMath(new Point(e.getY(), width - (e.getX() - 95)),
+								new Point(e.getY(), width - (e.getX() + 35)), rightPosition, leftPosition, 100, 0.97);
 
-					rightCoords = math.createCoordList().get(1);
-					leftCoords = math.createCoordList().get(0);
+						rightCoords = math.createCoordList().get(1);
+						leftCoords = math.createCoordList().get(0);
+					}
 
 					clickFlag = false;
 				}
@@ -156,6 +189,11 @@ public class Display extends JPanel implements ActionListener {
 				}
 			}
 		}
+		g2.setColor(Color.GRAY);
+		g2.fillRect(0, height - 150, width, 150);
+		if (previousSelection != null) {
+			g2.drawString(previousSelection, 300, 100);
+		}
 	}
 
 	public void drawFrame() {
@@ -164,10 +202,19 @@ public class Display extends JPanel implements ActionListener {
 			public void run() {
 				frame = new JFrame();
 				panel = new Display(macroLocation, imageLocation, robotLocation);
+				panel.setLayout(null);
+				
+				drawPath.setBounds(20, height - 120, width / 5 - 40, 50);
 				panel.add(drawPath);
-				panel.add(one);
-				panel.add(two);
-				panel.add(three);
+				
+				add.setBounds(width / 5, height - 120, width / 5 - 80, 50);
+				panel.add(add);
+				
+				pathChooser.setBounds(2 * width / 5 - 60, height - 120, width / 5 + 20, 50);
+				panel.add(pathChooser);
+				
+				select.setBounds(3 * width / 5 - 20 , height - 120, width / 5 - 80, 50);
+				panel.add(select);
 				frame.add(panel);
 				frame.setSize(Toolkit.getDefaultToolkit().getScreenSize().width + 100,
 						Toolkit.getDefaultToolkit().getScreenSize().height + 100);
@@ -228,9 +275,9 @@ public class Display extends JPanel implements ActionListener {
 			}.start();
 		}
 
-		if ("one".equals(e.getActionCommand())) {
+		if ("select".equals(e.getActionCommand())) {
 
-			String[] split = macroLocation.get(0).split("&");
+			String[] split = ((String) pathChooser.getSelectedItem()).split("&");
 
 			if (split.length >= 1) {
 				rightPosition = CSVParser.readRightPosition(split[0]);
@@ -255,10 +302,9 @@ public class Display extends JPanel implements ActionListener {
 
 			if (rightPosition1 != null && leftPosition1 != null) {
 				for (int i = 0; i < rightPosition1.size() && i < leftPosition1.size(); i++) {
-					rightPosition1.set(i, (rightPosition1.get(i) * scale)
-							+ rightPosition.get(rightPosition.size() - 1));
-					leftPosition1.set(i, (leftPosition1.get(i) * scale)
-							+ rightPosition.get(leftPosition.size() - 1));
+					rightPosition1.set(i,
+							(rightPosition1.get(i) * scale) + rightPosition.get(rightPosition.size() - 1));
+					leftPosition1.set(i, (leftPosition1.get(i) * scale) + rightPosition.get(leftPosition.size() - 1));
 				}
 				rightPosition.addAll(rightPosition1);
 				leftPosition.addAll(leftPosition1);
@@ -266,111 +312,30 @@ public class Display extends JPanel implements ActionListener {
 
 			if (rightPosition2 != null && leftPosition2 != null) {
 				for (int i = 0; i < rightPosition2.size() && i < leftPosition2.size(); i++) {
-					rightPosition2.set(i, rightPosition2.get(i) * scale
-							+ rightPosition.get(rightPosition.size() - 1));
-					leftPosition2.set(i, leftPosition2.get(i) * scale
-							+ leftPosition.get(leftPosition.size() - 1));
+					rightPosition2.set(i, rightPosition2.get(i) * scale + rightPosition.get(rightPosition.size() - 1));
+					leftPosition2.set(i, leftPosition2.get(i) * scale + leftPosition.get(leftPosition.size() - 1));
 				}
 
 				rightPosition.addAll(rightPosition2);
 				leftPosition.addAll(leftPosition2);
 			}
 
+			math = new SharkMath(
+					new Point(height - MouseInfo.getPointerInfo().getLocation().y,
+							width - (MouseInfo.getPointerInfo().getLocation().x - 95)),
+					new Point(height - MouseInfo.getPointerInfo().getLocation().y,
+							width - (MouseInfo.getPointerInfo().getLocation().x + 35)),
+					rightPosition, leftPosition, 130, 0.97);
+
+			rightCoords = math.createCoordList().get(1);
+			leftCoords = math.createCoordList().get(0);
+
+			clickFlag = false;
+			this.repaint();
 		}
-		if ("three".equals(e.getActionCommand())) {
 
-			String[] split = macroLocation.get(2).split("&");
-
-			if (split.length >= 1) {
-				rightPosition = CSVParser.readRightPosition(split[0]);
-				leftPosition = CSVParser.readLeftPosition(split[0]);
-			}
-
-			if (split.length >= 2) {
-				rightPosition1 = CSVParser.readRightPosition(split[1]);
-				leftPosition1 = CSVParser.readLeftPosition(split[1]);
-			}
-
-			if (split.length >= 3) {
-				rightPosition2 = CSVParser.readRightPosition(split[2]);
-				leftPosition2 = CSVParser.readLeftPosition(split[2]);
-			}
-			if (rightPosition != null && leftPosition != null) {
-				for (int i = 0; i < rightPosition.size() && i < leftPosition.size(); i++) {
-					rightPosition.set(i, rightPosition.get(i) * scale);
-					leftPosition.set(i, leftPosition.get(i) * scale);
-				}
-			}
-
-			if (rightPosition1 != null && leftPosition1 != null) {
-				for (int i = 0; i < rightPosition1.size() && i < leftPosition1.size(); i++) {
-					rightPosition1.set(i, (rightPosition1.get(i) * scale)
-							+ rightPosition.get(rightPosition.size() - 1));
-					leftPosition1.set(i, (leftPosition1.get(i) * scale)
-							+ rightPosition.get(leftPosition.size() - 1));
-				}
-				rightPosition.addAll(rightPosition1);
-				leftPosition.addAll(leftPosition1);
-			}
-
-			if (rightPosition2 != null && leftPosition2 != null) {
-				for (int i = 0; i < rightPosition2.size() && i < leftPosition2.size(); i++) {
-					rightPosition2.set(i, rightPosition2.get(i) * scale
-							+ rightPosition.get(rightPosition.size() - 1));
-					leftPosition2.set(i, leftPosition2.get(i) * scale
-							+ leftPosition.get(leftPosition.size() - 1));
-				}
-
-				rightPosition.addAll(rightPosition2);
-				leftPosition.addAll(leftPosition2);
-			}
-		}
-		if ("two".equals(e.getActionCommand())) {
-			String[] split = macroLocation.get(1).split("&");
-
-			if (split.length >= 1) {
-				rightPosition = CSVParser.readRightPosition(split[0]);
-				leftPosition = CSVParser.readLeftPosition(split[0]);
-			}
-
-			if (split.length >= 2) {
-				rightPosition1 = CSVParser.readRightPosition(split[1]);
-				leftPosition1 = CSVParser.readLeftPosition(split[1]);
-			}
-
-			if (split.length >= 3) {
-				rightPosition2 = CSVParser.readRightPosition(split[2]);
-				leftPosition2 = CSVParser.readLeftPosition(split[2]);
-			}
-			if (rightPosition != null && leftPosition != null) {
-				for (int i = 0; i < rightPosition.size() && i < leftPosition.size(); i++) {
-					rightPosition.set(i, rightPosition.get(i) * scale);
-					leftPosition.set(i, leftPosition.get(i) * scale);
-				}
-			}
-
-			if (rightPosition1 != null && leftPosition1 != null) {
-				for (int i = 0; i < rightPosition1.size() && i < leftPosition1.size(); i++) {
-					rightPosition1.set(i, (rightPosition1.get(i) * scale)
-							+ rightPosition.get(rightPosition.size() - 1));
-					leftPosition1.set(i, (leftPosition1.get(i) * scale)
-							+ rightPosition.get(leftPosition.size() - 1));
-				}
-				rightPosition.addAll(rightPosition1);
-				leftPosition.addAll(leftPosition1);
-			}
-
-			if (rightPosition2 != null && leftPosition2 != null) {
-				for (int i = 0; i < rightPosition2.size() && i < leftPosition2.size(); i++) {
-					rightPosition2.set(i, rightPosition2.get(i) * scale
-							+ rightPosition.get(rightPosition.size() - 1));
-					leftPosition2.set(i, leftPosition2.get(i) * scale
-							+ leftPosition.get(leftPosition.size() - 1));
-				}
-
-				rightPosition.addAll(rightPosition2);
-				leftPosition.addAll(leftPosition2);
-			}
+		if ("add".equals(e.getActionCommand())) {
+			pathChooser.addItem((String) pathChooser.getSelectedItem());
 		}
 
 	}
