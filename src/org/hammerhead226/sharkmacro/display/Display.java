@@ -129,8 +129,8 @@ public class Display extends JPanel implements ActionListener {
 				repaint();
 				if (!clickFlag) {
 					if (rightPosition != null & leftPosition != null) {
-						math = new SharkMath(new Point(height - e.getY(), width - (e.getX() - 95)),
-								new Point(height - e.getY(), width - (e.getX() + 35)), rightPosition, leftPosition, 130,
+						math = new SharkMath(new Point(e.getX() * 3, height - (e.getY() * 3 - 1095)),
+								new Point(e.getX() * 3, height - (e.getY() * 3 - 965)), rightPosition, leftPosition, 130,
 								0.97);
 
 						rightCoords = math.createCoordList().get(1);
@@ -154,8 +154,8 @@ public class Display extends JPanel implements ActionListener {
 					drawPath.setEnabled(false);
 					clickFlag = false;
 					if (rightPosition != null && leftPosition != null) {
-						math = new SharkMath(new Point(e.getY(), width - (e.getX() - 95)),
-								new Point(e.getY(), width - (e.getX() + 35)), rightPosition, leftPosition, 100, 0.97);
+						math = new SharkMath(new Point(e.getX() * 3, height - (e.getY() * 3 - 1095)),
+								new Point(e.getX() * 3, height - (e.getY() * 3 - 965)), rightPosition, leftPosition, 100, 0.97);
 
 						rightCoords = math.createCoordList().get(1);
 						leftCoords = math.createCoordList().get(0);
@@ -178,7 +178,7 @@ public class Display extends JPanel implements ActionListener {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.drawImage(background, -150, -1775, this);
+		g.drawImage(background, 0, 0, this);
 		g2 = (Graphics2D) g;
 		g.setFont(new Font("Arial", Font.PLAIN, 14));
 		if (math != null) {
@@ -215,6 +215,7 @@ public class Display extends JPanel implements ActionListener {
 				
 				select.setBounds(3 * width / 5 - 20 , height - 120, width / 5 - 80, 50);
 				panel.add(select);
+				
 				frame.add(panel);
 				frame.setSize(Toolkit.getDefaultToolkit().getScreenSize().width + 100,
 						Toolkit.getDefaultToolkit().getScreenSize().height + 100);
@@ -240,7 +241,7 @@ public class Display extends JPanel implements ActionListener {
 				public void run() {
 					pathFlag = true;
 
-					for (int i = 0; i < rightCoords.size(); i = i + 3) {
+					for (int i = 0; i < rightCoords.size(); i = i + 1) {
 						int j = i;
 						panel = new Display(macroLocation, imageLocation, robotLocation);
 						pathCounter = j;
@@ -250,7 +251,7 @@ public class Display extends JPanel implements ActionListener {
 								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x + 1000,
 										MouseInfo.getPointerInfo().getLocation().y);
 							}
-							if (i % 6 == 0) {
+							if (i % 2 == 0) {
 								bot.mouseMove(MouseInfo.getPointerInfo().getLocation().x,
 										MouseInfo.getPointerInfo().getLocation().y + 1);
 							} else {
@@ -321,10 +322,10 @@ public class Display extends JPanel implements ActionListener {
 			}
 
 			math = new SharkMath(
-					new Point(height - MouseInfo.getPointerInfo().getLocation().y,
-							width - (MouseInfo.getPointerInfo().getLocation().x - 95)),
-					new Point(height - MouseInfo.getPointerInfo().getLocation().y,
-							width - (MouseInfo.getPointerInfo().getLocation().x + 35)),
+					new Point(MouseInfo.getPointerInfo().getLocation().x * 3,
+							(MouseInfo.getPointerInfo().getLocation().y * 3 - 1095)),
+					new Point(MouseInfo.getPointerInfo().getLocation().x * 3,
+							(MouseInfo.getPointerInfo().getLocation().y * 3 - 965)),
 					rightPosition, leftPosition, 130, 0.97);
 
 			rightCoords = math.createCoordList().get(1);

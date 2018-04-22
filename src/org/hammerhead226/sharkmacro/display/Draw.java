@@ -21,13 +21,13 @@ public class Draw {
 		for (int i = 0; i < right.size() - 1; i++) {
 
 			g.setColor(Color.RED);
-			g.fillOval(width - (right.get(i).y / 120), height - right.get(i).x / 120, 2, 2);
-			g.drawLine(width - ((right.get(i).y - 1) / 120), height - ((right.get(i).x - 1) / 120),
-					width - ((right.get(i + 1).y - 1) / 120), height - ((right.get(i + 1).x - 1) / 120));
+			g.fillOval((right.get(i).x / 310), height - right.get(i).y / 310, 2, 2);
+			g.drawLine(((right.get(i).x - 1) / 310), (height - (right.get(i).y - 1) / 310),
+					((right.get(i + 1).x - 1) / 310), (height - (right.get(i + 1).y - 1) / 310));
 			g.setColor(Color.BLUE);
-			g.fillOval(width - (left.get(i).y / 120), height - left.get(i).x / 120, 2, 2);
-			g.drawLine(width - ((left.get(i).y - 1) / 120), height - ((left.get(i).x - 1) / 120),
-					width - ((left.get(i + 1).y - 1) / 120), height - ((left.get(i + 1).x - 1) / 120));
+			g.fillOval((left.get(i).x / 310), height - left.get(i).y / 310, 2, 2);
+			g.drawLine(((left.get(i).x - 1) / 310), (height - (left.get(i).y - 1) / 310),
+					((left.get(i + 1).x - 1) / 310), (height - (left.get(i + 1).y - 1) / 310));
 
 		}
 	}
@@ -36,7 +36,7 @@ public class Draw {
 			int point) {
 
 		g.setColor(Color.BLACK);
-		g.drawLine(width - (left.get(point).y / 120), height - (left.get(point).x / 120),
-				width - (right.get(point).y / 120), height - (right.get(point).x / 120));
+		g.drawLine((left.get(point).x / 310), height - (left.get(point).y / 310),
+				(right.get(point).x / 310), height - (right.get(point).y / 310));
 	}
 }
