@@ -40,10 +40,14 @@ public class Display extends JPanel implements ActionListener {
 	private BufferedImage robot;
 
 	private static JButton drawPath;
+	
 	private static JButton one;
 	private static JButton two;
 	private static JButton select;
+	
 	private static JButton add;
+	
+	private static JButton toggleMode;
 
 	private static JTextField path1;
 	private static JTextField path2;
@@ -65,6 +69,7 @@ public class Display extends JPanel implements ActionListener {
 
 	private boolean clickFlag = false;
 	private boolean pathFlag = false;
+	private boolean mode = false;
 
 	private SharkMath math;
 
@@ -95,6 +100,10 @@ public class Display extends JPanel implements ActionListener {
 		path1.setText(macroLocation.get(0));
 		path2.setText(macroLocation.get(1));
 		path3.setText(macroLocation.get(2));
+		
+		toggleMode = new JButton("Toggle Mode");
+		toggleMode.setActionCommand("toggle");
+		toggleMode.addActionListener(this);
 
 		add = new JButton("Add Path");
 		add.setActionCommand("add");
@@ -215,6 +224,9 @@ public class Display extends JPanel implements ActionListener {
 				
 				select.setBounds(3 * width / 5 - 20 , height - 120, width / 5 - 80, 50);
 				panel.add(select);
+				
+				toggleMode.setBounds(width - 150, height - 120, 130, 50);
+				panel.add(toggleMode);
 				
 				frame.add(panel);
 				frame.setSize(Toolkit.getDefaultToolkit().getScreenSize().width + 100,
@@ -337,6 +349,22 @@ public class Display extends JPanel implements ActionListener {
 
 		if ("add".equals(e.getActionCommand())) {
 			pathChooser.addItem((String) pathChooser.getSelectedItem());
+		}
+		
+		if("toggle".equals(e.getActionCommand())) {
+			if(mode) {
+				mode = false;
+				drawPath.setVisible(true);
+				add.setVisible(true);
+				pathChooser.setVisible(true);
+				select.setVisible(true);
+			} else {
+				mode = true;
+				drawPath.setVisible(false);
+				add.setVisible(false);
+				pathChooser.setVisible(false);
+				select.setVisible(false);
+			}
 		}
 
 	}
