@@ -40,13 +40,12 @@ public class Display extends JPanel implements ActionListener {
 	private BufferedImage robot;
 
 	private static JButton drawPath;
-	
-	private static JButton one;
-	private static JButton two;
 	private static JButton select;
-	
-	private static JButton add;
-	
+	private static JButton addMacro;
+	private static JButton deselect;
+
+	private static JButton startPath;
+	private static JButton stopPath;
 	private static JButton toggleMode;
 
 	private static JTextField path1;
@@ -67,9 +66,14 @@ public class Display extends JPanel implements ActionListener {
 	private ArrayList<Point> rightCoords;
 	private ArrayList<Point> leftCoords;
 
+	private ArrayList<Point> pathCoords;
+
+	private Point currentPosition;
+
 	private boolean clickFlag = false;
 	private boolean pathFlag = false;
 	private boolean mode = false;
+	private boolean pathStarted = false;
 
 	private SharkMath math;
 
@@ -82,13 +86,12 @@ public class Display extends JPanel implements ActionListener {
 
 	public Display panel;
 
-	private String previousSelection;
-
 	private Graphics2D g2;
 
 	private double scale = 6.15 * Math.PI / 4096 * 5.8;
 
 	public Display(List<String> macroLocation, String backgroundLocation, String robotLocation) {
+		pathCoords = new ArrayList<Point>();
 
 		path1 = new JTextField(20);
 		path2 = new JTextField(20);
@@ -100,32 +103,38 @@ public class Display extends JPanel implements ActionListener {
 		path1.setText(macroLocation.get(0));
 		path2.setText(macroLocation.get(1));
 		path3.setText(macroLocation.get(2));
-		
+
 		toggleMode = new JButton("Toggle Mode");
 		toggleMode.setActionCommand("toggle");
 		toggleMode.addActionListener(this);
 
-		add = new JButton("Add Path");
-		add.setActionCommand("add");
-		add.addActionListener(this);
-		add.setEnabled(true);
+		addMacro = new JButton("Add Macro");
+		addMacro.setActionCommand("add");
+		addMacro.addActionListener(this);
+		addMacro.setEnabled(true);
 
 		drawPath = new JButton("Show Path");
 		drawPath.setActionCommand("show path");
 		drawPath.addActionListener(this);
 		drawPath.setEnabled(false);
 
-		one = new JButton("Path One");
-		one.setActionCommand("one");
-		one.addActionListener(this);
+		startPath = new JButton("Start Path");
+		startPath.setActionCommand("start");
+		startPath.addActionListener(this);
+		startPath.setVisible(false);
+
+		stopPath = new JButton("Stop Path");
+		stopPath.setActionCommand("stop");
+		stopPath.addActionListener(this);
+		stopPath.setVisible(false);
+		
+		deselect = new JButton("Deselect");
+		deselect.setActionCommand("deselect");
+		deselect.addActionListener(this);
 
 		select = new JButton("Select");
 		select.setActionCommand("select");
 		select.addActionListener(this);
-
-		two = new JButton("Path Two");
-		two.setActionCommand("two");
-		two.addActionListener(this);
 
 		this.macroLocation = macroLocation;
 		this.imageLocation = backgroundLocation;
@@ -135,43 +144,57 @@ public class Display extends JPanel implements ActionListener {
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				repaint();
-				if (!clickFlag) {
-					if (rightPosition != null & leftPosition != null) {
-						math = new SharkMath(new Point(e.getX() * 3, height - (e.getY() * 3 - 1095)),
-								new Point(e.getX() * 3, height - (e.getY() * 3 - 965)), rightPosition, leftPosition, 130,
-								0.97);
 
-						rightCoords = math.createCoordList().get(1);
-						leftCoords = math.createCoordList().get(0);
+				if (!mode) {
+					if (!clickFlag) {
+						if (rightPosition != null & leftPosition != null) {
+							math = new SharkMath(new Point(e.getX() * 3, height - (e.getY() * 3 - 1095)),
+									new Point(e.getX() * 3, height - (e.getY() * 3 - 965)), rightPosition, leftPosition,
+									130, 0.97);
+
+							rightCoords = math.createCoordList().get(1);
+							leftCoords = math.createCoordList().get(0);
+						}
 					}
+
+				} else {
+
 				}
 
+				repaint();
 			}
 		});
 
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (!clickFlag) {
-					if (math != null) {
-						clickFlag = true;
-						drawPath.setEnabled(true);
-					}
 
+				if (!mode) {
+					if (!clickFlag) {
+						if (math != null) {
+							clickFlag = true;
+							drawPath.setEnabled(true);
+						}
+
+					} else {
+						drawPath.setEnabled(false);
+						clickFlag = false;
+						if (rightPosition != null && leftPosition != null) {
+							math = new SharkMath(new Point(e.getX() * 3, height - (e.getY() * 3 - 1095)),
+									new Point(e.getX() * 3, height - (e.getY() * 3 - 965)), rightPosition, leftPosition,
+									100, 0.97);
+
+							rightCoords = math.createCoordList().get(1);
+							leftCoords = math.createCoordList().get(0);
+						}
+
+						clickFlag = false;
+					}
 				} else {
-					drawPath.setEnabled(false);
-					clickFlag = false;
-					if (rightPosition != null && leftPosition != null) {
-						math = new SharkMath(new Point(e.getX() * 3, height - (e.getY() * 3 - 1095)),
-								new Point(e.getX() * 3, height - (e.getY() * 3 - 965)), rightPosition, leftPosition, 100, 0.97);
-
-						rightCoords = math.createCoordList().get(1);
-						leftCoords = math.createCoordList().get(0);
-					}
-
-					clickFlag = false;
+					pathCoords.add(e.getPoint());
 				}
+
+				repaint();
 			}
 		});
 
@@ -190,19 +213,18 @@ public class Display extends JPanel implements ActionListener {
 		g.drawImage(background, 0, 0, this);
 		g2 = (Graphics2D) g;
 		g.setFont(new Font("Arial", Font.PLAIN, 14));
-		if (math != null) {
-			Draw.drawPath(g2, rightCoords, leftCoords);
-			if (pathFlag) {
-				if (pathCounter < rightCoords.size()) {
-					Draw.drawRobot(g2, rightCoords, leftCoords, robot, pathCounter);
+		if (!mode) {
+			if (math != null) {
+				Draw.drawPath(g2, rightCoords, leftCoords);
+				if (pathFlag) {
+					if (pathCounter < rightCoords.size()) {
+						Draw.drawRobot(g2, rightCoords, leftCoords, robot, pathCounter);
+					}
 				}
 			}
 		}
 		g2.setColor(Color.GRAY);
 		g2.fillRect(0, height - 150, width, 150);
-		if (previousSelection != null) {
-			g2.drawString(previousSelection, 300, 100);
-		}
 	}
 
 	public void drawFrame() {
@@ -212,22 +234,31 @@ public class Display extends JPanel implements ActionListener {
 				frame = new JFrame();
 				panel = new Display(macroLocation, imageLocation, robotLocation);
 				panel.setLayout(null);
-				
+
 				drawPath.setBounds(20, height - 120, width / 5 - 40, 50);
 				panel.add(drawPath);
-				
-				add.setBounds(width / 5, height - 120, width / 5 - 80, 50);
-				panel.add(add);
-				
+
+				startPath.setBounds(20, height - 120, width / 5 - 40, 50);
+				panel.add(startPath);
+
+				stopPath.setBounds(20, height - 120, width / 5 - 40, 50);
+				panel.add(stopPath);
+
+				addMacro.setBounds(width / 5, height - 120, width / 5 - 80, 50);
+				panel.add(addMacro);
+
 				pathChooser.setBounds(2 * width / 5 - 60, height - 120, width / 5 + 20, 50);
 				panel.add(pathChooser);
-				
-				select.setBounds(3 * width / 5 - 20 , height - 120, width / 5 - 80, 50);
+
+				select.setBounds(3 * width / 5 - 20, height - 120, width / 5 - 80, 50);
 				panel.add(select);
 				
+				deselect.setBounds(4 * width / 5 - 80, height - 120, width / 5 - 80, 50);
+				panel.add(deselect);
+
 				toggleMode.setBounds(width - 150, height - 120, 130, 50);
 				panel.add(toggleMode);
-				
+
 				frame.add(panel);
 				frame.setSize(Toolkit.getDefaultToolkit().getScreenSize().width + 100,
 						Toolkit.getDefaultToolkit().getScreenSize().height + 100);
@@ -351,20 +382,50 @@ public class Display extends JPanel implements ActionListener {
 			pathChooser.addItem((String) pathChooser.getSelectedItem());
 		}
 		
-		if("toggle".equals(e.getActionCommand())) {
-			if(mode) {
-				mode = false;
-				drawPath.setVisible(true);
-				add.setVisible(true);
-				pathChooser.setVisible(true);
-				select.setVisible(true);
+		if("deselct".equals(e.getActionCommand())) {
+			rightCoords = new ArrayList<Point>();
+			leftCoords = new ArrayList<Point>();
+			
+			this.repaint();
+		}
+
+		if ("toggle".equals(e.getActionCommand())) {
+
+			if (!pathFlag) {
+				if (mode) {
+					mode = false;
+					drawPath.setVisible(true);
+					addMacro.setVisible(true);
+					pathChooser.setVisible(true);
+					select.setVisible(true);
+					deselect.setVisible(true);
+
+					startPath.setVisible(false);
+					stopPath.setVisible(false);
+				} else {
+					mode = true;
+					drawPath.setVisible(false);
+					addMacro.setVisible(false);
+					pathChooser.setVisible(false);
+					select.setVisible(false);
+					deselect.setVisible(false);
+					startPath.setVisible(true);
+				}
 			} else {
-				mode = true;
-				drawPath.setVisible(false);
-				add.setVisible(false);
-				pathChooser.setVisible(false);
-				select.setVisible(false);
+				
 			}
+		}
+
+		if ("start".equals(e.getActionCommand())) {
+			pathFlag = true;
+			startPath.setVisible(false);
+			stopPath.setVisible(true);
+		}
+
+		if ("stop".equals(e.getActionCommand())) {
+			pathFlag = false;
+			stopPath.setVisible(false);
+			startPath.setVisible(true);
 		}
 
 	}
