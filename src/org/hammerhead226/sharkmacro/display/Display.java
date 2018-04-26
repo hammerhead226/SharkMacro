@@ -81,6 +81,7 @@ public class Display extends JPanel implements ActionListener {
 
 	private String imageLocation;
 	private String robotLocation;
+	private String message;
 
 	private JFrame frame;
 
@@ -222,6 +223,14 @@ public class Display extends JPanel implements ActionListener {
 					}
 				}
 			}
+		}
+		
+		if(message != null) {
+			g2.setColor(Color.BLACK);
+			g2.fillRect(100, 100, 100 + message.length() + 10, 20);
+			g2.setColor(Color.WHITE);
+			g2.setFont(new Font("Serif", Font.BOLD, 14));
+			g2.drawString(message, 100, 110);
 		}
 		g2.setColor(Color.GRAY);
 		g2.fillRect(0, height - 150, width, 150);
@@ -412,20 +421,27 @@ public class Display extends JPanel implements ActionListener {
 					startPath.setVisible(true);
 				}
 			} else {
+				message = "Path still running";
+				this.repaint();
 				
 			}
+			
 		}
 
 		if ("start".equals(e.getActionCommand())) {
 			pathFlag = true;
 			startPath.setVisible(false);
 			stopPath.setVisible(true);
+			
+			message = "Started";
 		}
 
 		if ("stop".equals(e.getActionCommand())) {
 			pathFlag = false;
 			stopPath.setVisible(false);
 			startPath.setVisible(true);
+			
+			message = "Stopped";
 		}
 
 	}
