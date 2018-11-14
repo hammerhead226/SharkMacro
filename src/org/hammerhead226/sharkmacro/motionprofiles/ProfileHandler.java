@@ -297,7 +297,7 @@ public class ProfileHandler {
 	 */
 	private TrajectoryDuration toTrajectoryDuration(int durationMs) {
 		TrajectoryDuration dur = TrajectoryDuration.Trajectory_Duration_0ms;
-		dur = dur.valueOf(durationMs);
+		dur = TrajectoryDuration.valueOf(durationMs);
 		if (dur.value != durationMs) {
 			DriverStation.getInstance();
 			DriverStation.reportError(

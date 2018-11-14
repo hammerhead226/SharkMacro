@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.hammerhead226.sharkmacro.Constants;
 
-import com.ctre.CANTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.Notifier;
