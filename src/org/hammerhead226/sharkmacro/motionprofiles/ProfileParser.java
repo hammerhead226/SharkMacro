@@ -40,13 +40,15 @@ public final class ProfileParser extends Parser {
 	 */
 	public boolean writeToFile(Profile profile) {
 		ArrayList<String[]> profileToWrite = new ArrayList<String[]>(profile.length);
-		String[][] left = profile.getLeftProfile_String();
-		String[][] right = profile.getRightProfile_String();
-
+		String[][][] profiles = profile.getProfiles_String();
 		for (int i = 0; i < profile.length; i++) {
-			String[] line = new String[] { left[i][0], left[i][1], right[i][0], right[i][1],
-					Integer.toString(profile.dt, 10) };
-			profileToWrite.add(line);
+			ArrayList<String> line = new ArrayList<String>(profile.getTalons().length + 1);
+			for (int j = 0; j < profile.getTalons().length; j++) {
+				line.add(profiles[j][i][0]);
+				line.add(profiles[j][i][1]);
+			}
+			line.add(Integer.toString(profile.dt, 10));
+			profileToWrite.add((String[]) line.toArray());
 		}
 
 		return super.writeToFile(profileToWrite);
@@ -64,35 +66,33 @@ public final class ProfileParser extends Parser {
 	 * 
 	 * @return a new {@code Profile} instance
 	 */
-	public Profile toObject(TalonSRX leftTalon, TalonSRX rightTalon, int leftPidSlotIdx, int rightPidSlotIdx) {
+	public Profile toObject(MotionProfileTalonSRX... talons) {
 		List<String[]> profileRaw = readFromFile();
 
 		if (profileRaw == null) {
 			DriverStation.getInstance();
 			DriverStation.reportError("Tried to load nonexistant Profile from name: " + super.filename, false);
-			return new Profile(new double[0][0], new double[0][0], leftTalon, rightTalon, leftPidSlotIdx,
-					rightPidSlotIdx);
+			return new Profile(talons);
 		}
 
-		// Process read values into Profile
-		String[][] left = new String[profileRaw.size()][3];
-		String[][] right = new String[profileRaw.size()][3];
-
-		for (int i = 0; i < profileRaw.size(); i++) {
-			left[i][0] = profileRaw.get(i)[0];
-			left[i][1] = profileRaw.get(i)[1];
-			left[i][2] = profileRaw.get(i)[4];
-
-			right[i][0] = profileRaw.get(i)[2];
-			right[i][1] = profileRaw.get(i)[3];
-			right[i][2] = profileRaw.get(i)[4];
+		int i = 0;
+		int j = 0;
+		int k = 1;
+		for (MotionProfileTalonSRX talon : talons) {
+			String[][] line = new String[profileRaw.size()][3];
+			line[i][0] = profileRaw.get(i)[j];
+			line[i][1] = profileRaw.get(i)[k];
+			line[i][2] = profileRaw.get(i)[profileRaw.get(i).length - 1];
+			talon.setProfile_String(line);
+			j = j + 2;
+			k = k + 2;
 		}
 
-		Profile p = new Profile(left, right, leftTalon, rightTalon, leftPidSlotIdx, rightPidSlotIdx);
+		Profile p = new Profile(talons);
 
 		return p;
 	}
-	
+
 	/**
 	 * Cache a saved profile.
 	 * 
@@ -102,7 +102,7 @@ public final class ProfileParser extends Parser {
 	public static void cache(String filename) {
 		Parser.cache(Constants.PROFILE_STORAGE_DIRECTORY, filename);
 	}
-	
+
 	/**
 	 * Cache all profiles in the profile storage directory.
 	 */

@@ -4,15 +4,12 @@ import java.util.ArrayList;
 
 import org.hammerhead226.sharkmacro.Constants;
 
-import com.ctre.CANTalon;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 import edu.wpi.first.wpilibj.Notifier;
 
 /**
  * Class for recording motion profiles in real time.
  * 
- * @author Alec Minchington
+ * @author Alec Minchington, Nidhi Jaison
  *
  */
 public class ProfileRecorder {
@@ -30,29 +27,7 @@ public class ProfileRecorder {
 	/**
 	 * An array of the Talons being recorded.
 	 */
-	private final TalonSRX[] talons;
-
-	/**
-	 * Holds the recorded positions of the left Talon.
-	 */
-	private ArrayList<Double> leftPosition = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
-
-	/**
-	 * Holds the recorded velocities of the left Talon.
-	 */
-	private ArrayList<Double> leftFeedforwardValues = new ArrayList<Double>(
-			Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
-
-	/**
-	 * Holds the recorded positions of the right Talon.
-	 */
-	private ArrayList<Double> rightPosition = new ArrayList<Double>(Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
-
-	/**
-	 * Holds the recorded velocities of the right Talon.
-	 */
-	private ArrayList<Double> rightFeedforwardValues = new ArrayList<Double>(
-			Constants.PROFILERECORDER_LIST_DEFAULT_LENGTH);
+	private final MotionProfileTalonSRX[] talons;
 
 	/**
 	 * A list of the lists holding the Talons' positions and velocities.
@@ -77,8 +52,8 @@ public class ProfileRecorder {
 	 * @param recordingType
 	 *            the type of data that will be recorded, either voltage or velocity
 	 */
-	public ProfileRecorder(TalonSRX left, TalonSRX right, RecordingType recordingType) {
-		talons = new TalonSRX[] { left, right };
+	public ProfileRecorder(RecordingType recordingType, MotionProfileTalonSRX...talons) {
+		this.talons = talons;
 		thread = new Notifier(new PeriodicRunnable());
 		this.recordingType = recordingType;
 	}
@@ -105,15 +80,15 @@ public class ProfileRecorder {
 		synchronized (listLock) {
 			lists = new ArrayList<ArrayList<Double>>() {
 				{
-					add(leftPosition);
-					add(leftFeedforwardValues);
-					add(rightPosition);
-					add(rightFeedforwardValues);
+					for(MotionProfileTalonSRX talon : talons) {
+						add(talon.position);
+						add(talon.feedForwardValues);
+					}
 				}
 			};
 		}
 		isRecording = false;
-		return new Recording(lists, talons[0], talons[1]);
+		return new Recording(lists, talons);
 	}
 
 	/**
@@ -148,19 +123,15 @@ public class ProfileRecorder {
 		public void run() {
 			synchronized (listLock) {
 				if (recordingType == RecordingType.VOLTAGE) {
-
-					leftPosition.add((double) talons[0].getSelectedSensorPosition(0));
-					leftFeedforwardValues.add(talons[0].getMotorOutputVoltage());
-
-					rightPosition.add((double) talons[1].getSelectedSensorPosition(0));
-					rightFeedforwardValues.add(talons[1].getMotorOutputVoltage());
-
+					for(MotionProfileTalonSRX talon : talons) {
+						talon.position.add((double) talon.getSelectedSensorPosition(0));
+						talon.feedForwardValues.add(talon.getMotorOutputVoltage());
+					}
 				} else {
-					leftPosition.add((double) talons[0].getSelectedSensorPosition(0));
-					leftFeedforwardValues.add((double) talons[0].getSelectedSensorVelocity(0));
-
-					rightPosition.add((double) talons[1].getSelectedSensorPosition(0));
-					rightFeedforwardValues.add((double) talons[1].getSelectedSensorVelocity(0));
+					for(MotionProfileTalonSRX talon : talons) {
+						talon.position.add((double) talon.getSelectedSensorPosition(0));
+						talon.feedForwardValues.add((double) talon.getSelectedSensorVelocity());
+					}
 				}
 			}
 		}
