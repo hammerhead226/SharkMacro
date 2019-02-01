@@ -6,7 +6,6 @@ import org.hammerhead226.sharkmacro.Constants;
 import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motion.SetValueMotionProfile;
 import com.ctre.phoenix.motion.TrajectoryPoint;
-import com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
@@ -221,7 +220,7 @@ public class ProfileHandler {
 		if (profileIndex == 0) {
 			for (int i = 0; i < talons.length; i++) {
 				talons[i].clearMotionProfileTrajectories();
-				talons[i].configMotionProfileTrajectoryPeriod(TrajectoryDuration.Trajectory_Duration_0ms.value, 0);
+				talons[i].configMotionProfileTrajectoryPeriod(0);
 				talons[i].clearMotionProfileHasUnderrun(0);
 			}
 		}
@@ -250,7 +249,7 @@ public class ProfileHandler {
 				trajPoints[i].position = profiles[i][profileIndex][0];
 				trajPoints[i].velocity = profiles[i][profileIndex][1];
 				trajPoints[i].headingDeg = 0;
-				trajPoints[i].timeDur = toTrajectoryDuration((int) profiles[i][profileIndex][2]);
+				trajPoints[i].timeDur = (int) profiles[i][profileIndex][2];
 				trajPoints[i].profileSlotSelect0 = pidSlotIdxs[i];
 				trajPoints[i].profileSlotSelect1 = 0;
 
@@ -295,16 +294,16 @@ public class ProfileHandler {
 	 *            time duration of the trajectory
 	 * @return {@code TrajectoryDuration} with the value of the passed duration
 	 */
-	private TrajectoryDuration toTrajectoryDuration(int durationMs) {
-		TrajectoryDuration dur = TrajectoryDuration.Trajectory_Duration_0ms;
-		dur = dur.valueOf(durationMs);
-		if (dur.value != durationMs) {
-			DriverStation.getInstance();
-			DriverStation.reportError(
-					"Trajectory Duration not supported - use configMotionProfileTrajectoryPeriod instead", false);
-		}
-		return dur;
-	}
+	// private TrajectoryDuration toTrajectoryDuration(int durationMs) {
+	// 	TrajectoryDuration dur = TrajectoryDuration.Trajectory_Duration_0ms;
+	// 	dur = TrajectoryDuration.valueOf(durationMs);
+	// 	if (dur.value != durationMs) {
+	// 		DriverStation.getInstance();
+	// 		DriverStation.reportError(
+	// 				"Trajectory Duration not supported - use configMotionProfileTrajectoryPeriod instead", false);
+	// 	}
+	// 	return dur;
+	// }
 
 	/**
 	 * @return the {@link com.ctre.CANTalon.MotionProfileStatus

@@ -5,7 +5,7 @@
 1. OpenCSV (tested on 4.1)
 2. Apache Commons Lang (tested on 3.7)
 3. WPILibJ
-4. Cross The Road Electronics Phoenix Lib
+4. Cross The Road Electronics Phoenix Lib(5.8.1)
 
 ## Installation (for FRC Eclipse)
 
