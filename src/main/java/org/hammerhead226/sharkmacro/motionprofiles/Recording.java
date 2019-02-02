@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import org.hammerhead226.sharkmacro.Constants;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 /**
  * Intermediary class that represents a raw recording of a motion profile.
  * 
@@ -20,31 +18,22 @@ public class Recording {
 	private ArrayList<ArrayList<Double>> recordings;
 
 	/**
-	 * Left Talon to pass to the {@link Profile} generated in {@link #toProfile()}.
+	 * Talons to pass to the {@link Profile} generated in {@link #toProfile()}.
 	 */
-	private TalonSRX leftTalon;
-
-	/**
-	 * Right Talon to pass to the {@link Profile} generated in {@link #toProfile()}.
-	 */
-	private TalonSRX rightTalon;
+	private MotionProfileTalonSRX[] talons;
 
 	/**
 	 * Constructs a new {@link Recording} object.
 	 * 
 	 * @param recordings
 	 *            a list containing the lists of recorded positions and velocities
-	 * @param leftTalon
-	 *            Talon used to record left position and velocity, passed from
-	 *            {@link ProfileRecorder#stop()}
-	 * @param rightTalon
-	 *            Talon used to record right position and velocity, passed from
+	 * @param talons
+	 *            Talons used to record position and velocity, passed from
 	 *            {@link ProfileRecorder#stop()}
 	 */
-	public Recording(ArrayList<ArrayList<Double>> recordings, TalonSRX leftTalon, TalonSRX rightTalon) {
+	public Recording(ArrayList<ArrayList<Double>> recordings, MotionProfileTalonSRX[] talons) {
 		this.recordings = recordings;
-		this.leftTalon = leftTalon;
-		this.rightTalon = rightTalon;
+		this.talons = talons;
 	}
 
 	/**
@@ -82,26 +71,22 @@ public class Recording {
 			}
 		}
 
-		ArrayList<Double> leftPosition = recordings.get(0);
-		ArrayList<Double> leftFeedforwardValues = recordings.get(1);
-		ArrayList<Double> rightPosition = recordings.get(2);
-		ArrayList<Double> rightFeedforwardValues = recordings.get(3);
+		double[][][] profiles = new double[talons.length][][];
 
-		double[][] leftProfile = new double[minSize][3];
-		double[][] rightProfile = new double[minSize][3];
-
-		for (int i = 0; i < minSize; i++) {
-			leftProfile[i][0] = leftPosition.get(i);
-			leftProfile[i][1] = leftFeedforwardValues.get(i);
-			leftProfile[i][2] = Constants.DT_MS;
-
-			rightProfile[i][0] = rightPosition.get(i);
-			rightProfile[i][1] = rightFeedforwardValues.get(i);
-			rightProfile[i][2] = Constants.DT_MS;
+		for (int i = 0; i < talons.length; i = i + 2) {
+			ArrayList<Double> position = recordings.get(i);
+			ArrayList<Double> feedForwardValues = recordings.get(i + 1);
+			MotionProfileTalonSRX talon = talons[i];
+			for (int j = 0; j < minSize; j++) {
+				talon.getProfile_Double()[j][0] = position.get(j);
+				talon.getProfile_Double()[j][1] = feedForwardValues.get(j);
+				talon.getProfile_Double()[j][2] = Constants.DT_MS;
+			}
+			profiles[i] = talon.getProfile_Double();
 		}
-		return new Profile(leftProfile, rightProfile);
+		return new Profile(profiles);
 	}
-	
+
 	/**
 	 * Converts an {@code ArrayList} of type Integer to an {@code ArrayList} of type
 	 * Double.

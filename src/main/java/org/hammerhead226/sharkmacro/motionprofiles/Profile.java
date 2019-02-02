@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
  * Class representation of a motion profile. Formatted to work with Talon SRX
  * motion profiling mode.
  * 
- * @author Alec Minchington
+ * @author Alec Minchington, Nidhi Jaison
  *
  */
 public class Profile {
@@ -32,106 +32,66 @@ public class Profile {
 	private ProfileHandler handler;
 
 	/**
-	 * the Talon to execute the left profile with
+	 * The PID Slots used on each {@link TalonSRX}
 	 */
-	private TalonSRX leftTalon;
+	private int[] pidSlotIdxs;
 
 	/**
-	 * the Talon to execute the right profile with
+	 * An array of {@link MotionProfileTalonSRX} to be recorded}
 	 */
-	private TalonSRX rightTalon;
+	private MotionProfileTalonSRX[] talons;
 
 	/**
-	 * The left motion profile.
+	 * An array of Profiles for each {@link TalonSRX}
 	 */
-	private double[][] leftProfile;
-
-	/**
-	 * The right motion profile.
-	 */
-	private double[][] rightProfile;
+	private double[][][] profiles;
 
 	/**
 	 * Constructs a new {@link Profile} object.
 	 * 
-	 * @param leftProfile
-	 *            the left motion profile
-	 * @param rightProfile
-	 *            the right motion profile
-	 * @param leftTalon
-	 *            the Talon to execute the left profile with
-	 * @param rightTalon
-	 *            the Talon to execute the right profile with
+	 * @param talons
+	 *            An array of MotionProfileTalons to execute profiles with. 
 	 */
-	public Profile(double[][] leftProfile, double[][] rightProfile, TalonSRX leftTalon, TalonSRX rightTalon,
-			int leftPidSlotIdx, int rightPidSlotIdx) {
-		this.leftProfile = leftProfile;
-		this.rightProfile = rightProfile;
-		this.leftTalon = leftTalon;
-		this.rightTalon = rightTalon;
-		this.length = this.leftProfile.length;
-		this.dt = (int) this.leftProfile[0][2];
+	public Profile(MotionProfileTalonSRX... talons) {
+		for (int i = 0; i < talons.length; i++) {
+			profiles[i] = talons[i].getProfile_Double();
+			this.talons[i] = talons[i];
+			pidSlotIdxs[i] = talons[i].getPidSlot();
+		}
+		length = talons[0].getProfile_Double().length;
+		dt = (int) talons[0].getProfile_Double()[0][2];
 
-		handler = new ProfileHandler(new double[][][] { leftProfile, rightProfile },
-				new TalonSRX[] { leftTalon, rightTalon }, new int[] { leftPidSlotIdx, rightPidSlotIdx });
-	}
-
-	/**
-	 * Constructs a new {@link Profile} object. Passed {@link java.lang.String
-	 * String} arrays are automatically converted to and stored as
-	 * {@link java.lang.Double Double} arrays.
-	 * 
-	 * @param leftProfile
-	 *            the left motion profile
-	 * @param rightProfile
-	 *            the right motion profile
-	 * @param leftTalon
-	 *            the Talon to execute the left profile with
-	 * @param rightTalon
-	 *            the Talon to execute the right profile with
-	 */
-	public Profile(String[][] leftProfile, String[][] rightProfile, TalonSRX leftTalon, TalonSRX rightTalon,
-			int leftPidSlotIdx, int rightPidSlotIdx) {
-		this.leftProfile = toDoubleArray(leftProfile);
-		this.rightProfile = toDoubleArray(rightProfile);
-		this.leftTalon = leftTalon;
-		this.rightTalon = rightTalon;
-		this.length = this.leftProfile.length;
-		this.dt = (int) this.leftProfile[0][2];
-
-		handler = new ProfileHandler(new double[][][] { this.leftProfile, this.rightProfile },
-				new TalonSRX[] { leftTalon, rightTalon }, new int[] { leftPidSlotIdx, rightPidSlotIdx });
-
+		handler = new ProfileHandler(profiles, this.talons, pidSlotIdxs);
 	}
 
 	/**
 	 * Constructs a new {@link Profile} object without execution Talons or PID slot
 	 * indexes. Only to be used in {@link Recording}.
 	 * 
-	 * @param leftProfile
-	 *            the left motion profile
-	 * @param rightProfile
-	 *            the right motion profile
+	 * @param profiles
+	 *            An array of motions profiles of all the Talons
+	 * 
 	 */
-	public Profile(double[][] leftProfile, double[][] rightProfile) {
-		this.leftProfile = leftProfile;
-		this.rightProfile = rightProfile;
-		this.length = this.leftProfile.length;
-		this.dt = (int) this.leftProfile[0][2];
+	public Profile(double[][]...profiles) {
+		this.profiles = profiles;
+		this.length = this.profiles[0].length;
+		this.dt = (int) this.profiles[0][0][2];
 	}
 
 	/**
-	 * Execute a motion profile. This is done by passing {@link #leftProfile} and
-	 * {@link #rightProfile} to new {@link ProfileHandler}s and calling their
+	 * Execute a motion profile. This is done by passing each {@link #profiles}
+	 * to new {@link ProfileHandler}s and calling their
 	 * {@link ProfileHandler#execute() execute()} method.
 	 * 
-	 * @param leftGainsProfile
-	 *            the PID slot index to use to execute the left motion profile
-	 * @param rightGainsProfile
-	 *            the PID slot index to use to execute the right motion profile
 	 */
 	public void execute() {
-		if (leftProfile.length != 0 && rightProfile.length != 0) {
+		boolean runProfile = true;
+		for(double[][] profile : profiles) {
+			if(profile.length == 0) {
+				runProfile = false;
+			}
+		}
+		if (runProfile) {
 			handler.execute();
 		} else {
 			DriverStation.getInstance();
@@ -168,28 +128,15 @@ public class Profile {
 	 * 
 	 * @return the left side motion profile
 	 */
-	public double[][] getLeftProfile_Double() {
-		return this.leftProfile;
-	}
-
-	/**
-	 * Returns this {@link Profile}'s {@link #rightProfile} property.
-	 * 
-	 * @return the right side motion profile
-	 */
-	public double[][] getRightProfile_Double() {
-		return this.rightProfile;
-	}
-
-	/**
-	 * Returns the result of {@link #toStringArray(double[][])} on
-	 * {@link #leftProfile}.
-	 * 
-	 * @return the {@link java.lang.String String} array representation of
-	 *         {@link #leftProfile}
-	 */
-	public String[][] getLeftProfile_String() {
-		return toStringArray(this.leftProfile);
+	public double[][] getProfile_Double(int port){
+		double[][] profile = null;
+		for(MotionProfileTalonSRX talon : talons) {
+			if(talon.getDeviceID() == port) {
+				profile = talon.getProfile_Double();
+			}
+		}
+		DriverStation.reportWarning("Cannot get empty profile", false);
+		return profile;
 	}
 
 	/**
@@ -199,8 +146,21 @@ public class Profile {
 	 * @return the {@link java.lang.String String} array representation of
 	 *         {@link #rightProfile}
 	 */
-	public String[][] getRightProfile_String() {
-		return toStringArray(this.rightProfile);
+	public String[][] getProfile_String(int port){
+		return toStringArray(getProfile_Double(port));
+	}
+	
+	public TalonSRX[] getTalons() {
+		return talons;
+	}
+	
+	public String[][][] getProfiles_String(){
+		String[][][] strProfiles = new String[profiles.length][][];
+		int i = 0;
+		for (double[][] profile : profiles) {
+			strProfiles[i++] = toStringArray(profile);
+		}
+		return strProfiles;
 	}
 
 	/**
@@ -211,7 +171,7 @@ public class Profile {
 	 *            the array to convert
 	 * @return the converted array
 	 */
-	private static String[][] toStringArray(double[][] arr) {
+	protected static String[][] toStringArray(double[][] arr) {
 		if (arr.length == 0) {
 			return new String[0][0];
 		}
@@ -231,7 +191,7 @@ public class Profile {
 	 *            the array to convert
 	 * @return the converted array
 	 */
-	private static double[][] toDoubleArray(String[][] arr) {
+	protected static double[][] toDoubleArray(String[][] arr) {
 		if (arr.length == 0) {
 			return new double[0][0];
 		}
