@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import org.hammerhead226.sharkmacro.Constants;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 /**
  * Intermediary class that represents a raw recording of a motion profile.
  * 

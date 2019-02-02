@@ -6,8 +6,6 @@ import java.util.List;
 import org.hammerhead226.sharkmacro.Constants;
 import org.hammerhead226.sharkmacro.Parser;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 import edu.wpi.first.wpilibj.DriverStation;
 
 /**
