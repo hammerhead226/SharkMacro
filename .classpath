@@ -3,5 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/CTREWPI"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/nidhi/wpilib/user/java/lib/opencsv-4.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Public/frc2019/maven/edu/wpi/first/wpilibj/wpilibj-java/2019.2.1/wpilibj-java-2019.2.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/nidhi/.gradle/caches/modules-2/files-2.1/com.ctre.phoenix/api-java/5.12.1/fa670d8c5af999645a422de4b9b55b21919e0c2e/api-java-5.12.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
